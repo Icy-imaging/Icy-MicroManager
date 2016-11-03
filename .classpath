@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="MM_HOME/plugins/Micro-Manager/MMCoreJ.jar" sourcepath="/MM_SOURCES"/>
+	<classpathentry kind="var" path="MM_HOME/plugins/Micro-Manager/MMJ_.jar" sourcepath="/GIT/micro-manager"/>
+	<classpathentry kind="var" path="ICY_HOME/icy.jar"/>
+	<classpathentry kind="output" path="bin"/>
+	<referencedentry kind="lib" path="D:/Stephane/Documents/dev/GIT/Icy-App/lib/swingx-all.jar" sourcepath="D:/Stephane/workspace/Libraries/SwingX"/>
+	<referencedentry kind="lib" path="D:/Stephane/Documents/dev/GIT/Icy-App/lib/bioformats.jar" sourcepath="/bioformats"/>
+</classpath>
