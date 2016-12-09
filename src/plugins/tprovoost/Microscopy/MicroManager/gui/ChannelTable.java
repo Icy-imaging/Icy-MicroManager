@@ -46,7 +46,8 @@ public class ChannelTable extends JTable
         final MMMainFrame mmframe = MicroManager.getInstance();
         final AcquisitionWrapperEngine eng = MicroManager.getAcquisitionEngine();
 
-        model = new ChannelTableModel(MicroManager.getMMStudio(), eng);
+        model = new ChannelTableModel(MicroManager.getMMStudio(), eng, mmframe.exposurePrefs, mmframe.colorPrefs,
+                mmframe.options);
         model.setChannels(eng.getChannels());
         model.addTableModelListener(model);
 
@@ -56,7 +57,7 @@ public class ChannelTable extends JTable
         setModel(model);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        final ChannelCellEditor cellEditor = new ChannelCellEditor(eng);
+        final ChannelCellEditor cellEditor = new ChannelCellEditor(eng, mmframe.exposurePrefs, mmframe.colorPrefs);
         final ChannelCellRenderer cellRenderer = new ChannelCellRenderer(eng);
 
         for (int k = 0; k < model.getColumnCount(); k++)

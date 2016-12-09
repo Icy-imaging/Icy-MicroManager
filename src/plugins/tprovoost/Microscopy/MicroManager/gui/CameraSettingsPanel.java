@@ -324,12 +324,12 @@ public class CameraSettingsPanel extends JPanel implements Runnable
 
     public void logError(Exception e)
     {
-    	ReportingUtils.logError(e);
+        getMMStudio().logError(e);
     }
 
     public void logError(Exception e, String msg)
     {
-    	ReportingUtils.logError(e, msg);
+        getMMStudio().logError(e, msg);
     }
 
     public String getCameraName()
@@ -411,7 +411,7 @@ public class CameraSettingsPanel extends JPanel implements Runnable
         }
         catch (Exception e)
         {
-        	ReportingUtils.logError(e);
+            getMMStudio().logError(e);
         }
     }
 
