@@ -9,6 +9,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.WindowConstants;
 
+import org.json.JSONObject;
 import org.micromanager.internal.MMStudio;
 import org.micromanager.internal.MMVersion;
 import org.micromanager.acquisition.internal.AcquisitionEngine;
@@ -43,16 +44,16 @@ import mmcorej.CMMCore;
 import mmcorej.MMCoreJ;
 import mmcorej.StrVector;
 import mmcorej.TaggedImage;
-import plugins.tongli.Microscopy.MicroManager2.core.AcquisitionResult;
-import plugins.tongli.Microscopy.MicroManager2.event.AcquisitionListener;
-import plugins.tongli.Microscopy.MicroManager2.event.LiveListener;
-import plugins.tongli.Microscopy.MicroManager2.gui.LoadFrame;
-import plugins.tongli.Microscopy.MicroManager2.gui.LoadingFrame;
-import plugins.tongli.Microscopy.MicroManager2.gui.MMMainFrame;
-import plugins.tongli.Microscopy.MicroManager2.tools.MMUtils;
-import plugins.tongli.Microscopy.MicroManager2.tools.StageMover;
-import plugins.tongli.Microscopy.MicroManager2ForIcy.MicromanagerPlugin;
-import plugins.tongli.Microscopy.MicroManager2ForIcy.MicroscopePlugin;
+import plugins.tprovoost.Microscopy.MicroManager.core.AcquisitionResult;
+import plugins.tprovoost.Microscopy.MicroManager.event.AcquisitionListener;
+import plugins.tprovoost.Microscopy.MicroManager.event.LiveListener;
+import plugins.tprovoost.Microscopy.MicroManager.gui.LoadFrame;
+import plugins.tprovoost.Microscopy.MicroManager.gui.LoadingFrame;
+import plugins.tprovoost.Microscopy.MicroManager.gui.MMMainFrame;
+import plugins.tprovoost.Microscopy.MicroManager.tools.MMUtils;
+import plugins.tprovoost.Microscopy.MicroManager.tools.StageMover;
+import plugins.tprovoost.Microscopy.MicroManagerForIcy.MicromanagerPlugin;
+import plugins.tprovoost.Microscopy.MicroManagerForIcy.MicroscopePlugin;
 
 public class MicroManager
 {
@@ -1324,8 +1325,9 @@ public class MicroManager
                     @Override
                     public void run()
                     {
+                        //TODO refer to todo below
                         // In AWT Thread because it creates a JComponent
-                        getAcquisitionEngine().addImageProcessor(new ImageAnalyser());
+//                        getAcquisitionEngine().addImageProcessor(new ImageAnalyser());
                     }
                 });
 
@@ -1490,79 +1492,80 @@ public class MicroManager
         acquisitionManager = null;
     }
 
+    // TODO this tagged image analyszer is no more existing in mm2; You should write a frame processor for this
     // custom TaggedImageAnalyzer so we have events for new image
-    private static class ImageAnalyser extends TaggedImageAnalyzer
-    {
-        ImageAnalyser()
-        {
-            super();
-        }
-
-        @Override
-        protected void analyze(TaggedImage image)
-        {
-            final List<AcquisitionListener> listeners = getAcquisitionListeners();
-
-            try
-            {
-                // no more image or last one ?
-                if ((image == null) || TaggedImageQueue.isPoison(image))
-                {
-                    if (acquisitionManager != null)
-                        acquisitionManager.done();
-
-                    // send acquisition ended event
-                    for (AcquisitionListener l : listeners)
-                        l.acquisitionFinished(getAcquisitionResult());
-
-                    // done
-                    return;
-                }
-
-                final JSONObject tags = image.tags;
-
-                boolean firstImage = (MDUtils.getPositionIndex(tags) == 0) && (MDUtils.getFrameIndex(tags) == 0)
-                        && (MDUtils.getChannelIndex(tags) == 0) && (MDUtils.getSliceIndex(tags) == 0);
-                boolean newAcquisition = (acquisitionManager == null) || acquisitionManager.isDone();
-
-                // first acquisition image or new acquisition --> create the new acquisition
-                if (firstImage || newAcquisition)
-                {
-                    // end previous acquisition
-                    if (!newAcquisition)
-                    {
-                        acquisitionManager.done();
-
-                        // send acquisition ended event
-                        for (AcquisitionListener l : listeners)
-                            l.acquisitionFinished(getAcquisitionResult());
-                    }
-
-                    final SequenceSettings settings = getAcquisitionSettings();
-                    final JSONObject metadata = getAcquisitionMetaData();
-
-                    // create the acquisition manager
-                    acquisitionManager = new AcquisitionResult(settings, metadata);
-
-                    // send acquisition started event
-                    for (AcquisitionListener l : listeners)
-                        l.acquisitionStarted(settings, metadata);
-                }
-
-                // store image in acquisition manager only if storage is enabled
-                if (getStoreLastAcquisition())
-                    acquisitionManager.imageReceived(image);
-
-                // send image received event
-                for (AcquisitionListener l : listeners)
-                    l.acqImgReveived(image);
-            }
-            catch (Exception e)
-            {
-                IcyExceptionHandler.showErrorMessage(e, true);
-            }
-        }
-    }
+//    private static class ImageAnalyser extends TaggedImageAnalyzer
+//    {
+//        ImageAnalyser()
+//        {
+//            super();
+//        }
+//
+//        @Override
+//        protected void analyze(TaggedImage image)
+//        {
+//            final List<AcquisitionListener> listeners = getAcquisitionListeners();
+//
+//            try
+//            {
+//                // no more image or last one ?
+//                if ((image == null) || TaggedImageQueue.isPoison(image))
+//                {
+//                    if (acquisitionManager != null)
+//                        acquisitionManager.done();
+//
+//                    // send acquisition ended event
+//                    for (AcquisitionListener l : listeners)
+//                        l.acquisitionFinished(getAcquisitionResult());
+//
+//                    // done
+//                    return;
+//                }
+//
+//                final JSONObject tags = image.tags;
+//
+//                boolean firstImage = (MDUtils.getPositionIndex(tags) == 0) && (MDUtils.getFrameIndex(tags) == 0)
+//                        && (MDUtils.getChannelIndex(tags) == 0) && (MDUtils.getSliceIndex(tags) == 0);
+//                boolean newAcquisition = (acquisitionManager == null) || acquisitionManager.isDone();
+//
+//                // first acquisition image or new acquisition --> create the new acquisition
+//                if (firstImage || newAcquisition)
+//                {
+//                    // end previous acquisition
+//                    if (!newAcquisition)
+//                    {
+//                        acquisitionManager.done();
+//
+//                        // send acquisition ended event
+//                        for (AcquisitionListener l : listeners)
+//                            l.acquisitionFinished(getAcquisitionResult());
+//                    }
+//
+//                    final SequenceSettings settings = getAcquisitionSettings();
+//                    final JSONObject metadata = getAcquisitionMetaData();
+//
+//                    // create the acquisition manager
+//                    acquisitionManager = new AcquisitionResult(settings, metadata);
+//
+//                    // send acquisition started event
+//                    for (AcquisitionListener l : listeners)
+//                        l.acquisitionStarted(settings, metadata);
+//                }
+//
+//                // store image in acquisition manager only if storage is enabled
+//                if (getStoreLastAcquisition())
+//                    acquisitionManager.imageReceived(image);
+//
+//                // send image received event
+//                for (AcquisitionListener l : listeners)
+//                    l.acqImgReveived(image);
+//            }
+//            catch (Exception e)
+//            {
+//                IcyExceptionHandler.showErrorMessage(e, true);
+//            }
+//        }
+//    }
 
     private static class LiveListenerThread extends Thread
     {

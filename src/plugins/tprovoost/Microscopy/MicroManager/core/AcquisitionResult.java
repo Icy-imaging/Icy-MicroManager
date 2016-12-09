@@ -9,6 +9,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.micromanager.acquisition.SequenceSettings;
+import org.micromanager.internal.utils.MDUtils;
 import org.micromanager.data.Coords;
 import org.micromanager.data.internal.DefaultImage;
 
