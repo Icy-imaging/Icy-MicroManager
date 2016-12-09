@@ -31,7 +31,7 @@ public interface AcquisitionListener
      * @see MicroManager#getAcquisitionResult()
      * @see MicroManager#setStoreLastAcquisition(boolean)
      */
-    public void acqImgReveived(Image image);
+    public void acqImgReveived(TaggedImage image);
 
     /**
      * Callback when {@link MicroManager#startAcquisition(int, double)} have

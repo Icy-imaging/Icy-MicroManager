@@ -74,7 +74,8 @@ public class AcquisitionHandler implements AcquisitionListener
 
         // not existing yet ? --> create it now
         if (advAcqDialog == null)
-            advAcqDialog = new AcqControlDlg(mmstudio.getAcquisitionEngine(),mmstudio);
+            advAcqDialog = new AcqControlDlg(mmstudio.getAcquisitionEngine(), mainFrame.getMainPreferences(), mmstudio,
+                    mainFrame.getOptions());
 
         // remove some of the default window listener
         final WindowListener[] winListeners = advAcqDialog.getWindowListeners();
@@ -253,7 +254,7 @@ public class AcquisitionHandler implements AcquisitionListener
     }
 
     @Override
-    public void acqImgReveived(Image newImg)
+    public void acqImgReveived(TaggedImage newImg)
     {
         ThreadUtil.invokeLater(new Runnable()
         {
