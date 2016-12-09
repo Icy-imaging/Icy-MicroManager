@@ -204,7 +204,7 @@ public class ConfigurationPanel extends JPanel
                         }
                         catch (Exception e1)
                         {
-                            getMMStudio().logError(e1);
+                        	ReportingUtils.logError(e1);
                         }
 
                         refreshConfigs(false);
@@ -319,7 +319,7 @@ public class ConfigurationPanel extends JPanel
                             }
                             catch (Exception e1)
                             {
-                                getMMStudio().logError(e1);
+                            	ReportingUtils.logError(e1);
                             }
                         }
                     }
@@ -334,7 +334,7 @@ public class ConfigurationPanel extends JPanel
                             }
                             catch (Exception e1)
                             {
-                                getMMStudio().logError(e1);
+                            	ReportingUtils.logError(e1);
                             }
                         }
                     }
