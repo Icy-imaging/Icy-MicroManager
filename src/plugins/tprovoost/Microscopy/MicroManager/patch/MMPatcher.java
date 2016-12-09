@@ -66,7 +66,7 @@ import icy.system.ClassPatcher;
  */
 public class MMPatcher
 {
-    private static final String PATCH_PKG = "plugins.tongli.Microscopy.MicroManager2.patch";
+    private static final String PATCH_PKG = "plugins.tprovoost.Microscopy.MicroManager.patch";
     private static final String PATCH_SUFFIX = "Methods";
 
     /** Overrides class behavior of Micro-Manager classes by injecting method hooks. */

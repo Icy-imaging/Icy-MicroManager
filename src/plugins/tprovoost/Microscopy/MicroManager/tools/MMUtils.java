@@ -536,9 +536,10 @@ public class MMUtils
             pos.setY(MDUtils.getYPositionUm(tags));
         if (MDUtils.hasZPositionUm(tags))
             pos.setZ(MDUtils.getZPositionUm(tags));
+        //TODO
         // get time info (we want it in second)
-        if (MDUtils.hasElapsedTimeMs(tags))
-            time = MDUtils.getElapsedTimeMs(tags) / 1000d;
+//        if (MDUtils.hasElapsedTimeMs(tags))
+//            time = MDUtils.getElapsedTimeMs(tags) / 1000d;
         // no time information but we have a start acquisition date ?
         if ((time == 0d) && (startDate != 0))
             time = (Calendar.getInstance().getTimeInMillis() - startDate) / 1000d;
