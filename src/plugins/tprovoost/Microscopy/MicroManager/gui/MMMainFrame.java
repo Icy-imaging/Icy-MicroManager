@@ -81,7 +81,6 @@ public class MMMainFrame extends IcyFrame
     AcquisitionHandler acquisitionHandler;
 
     // extract these fields from original MMStudio object
-    MMOptions options;
     Preferences mainPreferences;
     Preferences exposurePrefs;
     Preferences colorPrefs;
@@ -119,7 +118,6 @@ public class MMMainFrame extends IcyFrame
         // set to null by default to ensure correct shutdown sequence
         mmstudio = null;
         acquisitionHandler = null;
-        options = null;
         mainPreferences = null;
         exposurePrefs = null;
         colorPrefs = null;
@@ -135,12 +133,12 @@ public class MMMainFrame extends IcyFrame
 
         try
         {
+        	//TODO
             // we have our own load config frame so we hide the one from MicroManager
-            final MMOptions options = new MMOptions();
-            options.loadSettings();
-            doNotAskConfigFileSave = options.doNotAskForConfigFile_;
-            options.doNotAskForConfigFile_ = true;
-            options.saveSettings();
+//            DefaultUserProfile.getInstance().
+//            options.loadSettings();
+            doNotAskConfigFileSave = DefaultUserProfile.getShouldAlwaysUseDefaultProfile();
+            mmstudio.getUserProfile().syncToDisk();
         }
         catch (Throwable t)
         {
@@ -168,13 +166,13 @@ public class MMMainFrame extends IcyFrame
                 {
                     try
                     {
-                        options = (MMOptions) ReflectionUtil.getFieldObject(mmstudio, "options_", true);
 
                         // patch some settings
-                        hideMDADisplaySave = options.hideMDADisplay_;
-                        closeOnExitSave = options.closeOnExit_;
-                        options.hideMDADisplay_ = true;
-                        options.closeOnExit_ = false;
+                        hideMDADisplaySave = mmstudio.getHideMDADisplayOption();
+                        closeOnExitSave = OptionsDlg.getShouldCloseOnExit();
+                        
+                        AcqControlDlg.setShouldHideMDADisplay(true);
+                    	OptionsDlg.setShouldCloseOnExit(false);
                     }
                     catch (Exception ex)
                     {
@@ -346,7 +344,8 @@ public class MMMainFrame extends IcyFrame
         // stop activities
         if (mmstudio != null)
         {
-            mmstudio.closeAllAcquisitions();
+            mmstudio.acquisitions().haltAcquisition();
+//            closeAllAcquisitions();
             mmstudio.closeSequence(true);
         }
 
@@ -354,12 +353,9 @@ public class MMMainFrame extends IcyFrame
         mainCallback = null;
 
         // restore patched settings
-        if (options != null)
-        {
-            options.doNotAskForConfigFile_ = doNotAskConfigFileSave;
-            options.hideMDADisplay_ = hideMDADisplaySave;
-            options.closeOnExit_ = closeOnExitSave;
-        }
+    	DefaultUserProfile.setShouldAlwaysUseDefaultProfile(doNotAskConfigFileSave);
+    	AcqControlDlg.setShouldHideMDADisplay(hideMDADisplaySave);
+//    	DefaultUserProfile.closeOnExit_ = closeOnExitSave;
     }
 
     /**
@@ -420,15 +416,15 @@ public class MMMainFrame extends IcyFrame
                         }
                         catch (Exception e1)
                         {
-                            mmstudio.logError(e1);
+                            ReportingUtils.logError(e1);
                         }
 
-                        ConfiguratorDlg2 configurator = new ConfiguratorDlg2(mmstudio.getCore(), MicroManager
-                                .getDefaultConfigFileName());
+                        String sysConfigFile = IntroDlg.getMostRecentlyUsedConfig();
+                        IntroDlg configurator = new IntroDlg(mmstudio, sysConfigFile, MMVersion.VERSION_STRING);
                         configurator.setVisible(true);
 
                         // define new default config file
-                        MicroManager.setDefaultConfigFileName(configurator.getFileName());
+                        MicroManager.setDefaultConfigFileName(configurator.getConfigFile());
                         // and load it
                         loadDefaultConfig();
                         refreshConfigs();
@@ -475,7 +471,7 @@ public class MMMainFrame extends IcyFrame
                             }
                             catch (Exception e1)
                             {
-                                mmstudio.logError(e1);
+                            	ReportingUtils.logError(e1);
                             }
 
                             // define new default config file
@@ -535,9 +531,9 @@ public class MMMainFrame extends IcyFrame
                     @Override
                     public void actionPerformed(ActionEvent e)
                     {
-                        PropertyEditor editor = new PropertyEditor();
-                        editor.setGui(mmstudio);
-                        editor.setCore(mmstudio.getCore());
+                        PropertyEditor editor = new PropertyEditor(mmstudio);
+                        //TODO
+//                        editor.setCore(mmstudio.getCore());
                         editor.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                         final IcyFrame propertyBrowser = FrameUtils.addMMWindowToDesktopPane(editor);
                         propertyBrowser.setSize(380, 480);
@@ -591,11 +587,8 @@ public class MMMainFrame extends IcyFrame
                     @Override
                     public void actionPerformed(ActionEvent e)
                     {
-                        if (options == null)
-                            return;
 
-                        final OptionsPanel optionsPanel = new OptionsPanel(MMMainFrame.this, options, mmstudio
-                                .getCore());
+                        final OptionsPanel optionsPanel = new OptionsPanel(MMMainFrame.this, mmstudio);
                         final ActionDialog optionsDialog = new ActionDialog("Micro-Manager Options", optionsPanel, Icy
                                 .getMainInterface().getMainFrame());
                         optionsDialog.setOkAction(optionsPanel);
@@ -722,11 +715,6 @@ public class MMMainFrame extends IcyFrame
     public AcquisitionHandler getAcquisitionHandler()
     {
         return acquisitionHandler;
-    }
-
-    public MMOptions getOptions()
-    {
-        return options;
     }
 
     public Preferences getMainPreferences()
