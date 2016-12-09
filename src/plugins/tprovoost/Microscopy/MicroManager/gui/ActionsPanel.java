@@ -14,7 +14,8 @@ import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
 import org.json.JSONObject;
-import org.micromanager.MMStudio;
+import org.micromanager.internal.MMStudio;
+import org.micromanager.internal.utils.ReportingUtils;
 
 import icy.gui.component.button.IcyButton;
 import icy.gui.component.button.IcyToggleButton;

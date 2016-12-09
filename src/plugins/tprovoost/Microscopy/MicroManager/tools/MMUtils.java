@@ -15,9 +15,9 @@ import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.micromanager.ConfigGroupPad;
-import org.micromanager.acquisition.TaggedImageQueue;
-import org.micromanager.utils.MDUtils;
+import org.micromanager.internal.ConfigGroupPad;
+import org.micromanager.acquisition.internal.TaggedImageQueue;
+import org.micromanager.internal.utils.MDUtils;
 
 import icy.file.FileUtil;
 import icy.gui.dialog.MessageDialog;

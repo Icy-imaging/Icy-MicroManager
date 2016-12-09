@@ -4,10 +4,9 @@ import icy.sequence.Sequence;
 
 import java.util.List;
 
-import mmcorej.TaggedImage;
-
 import org.json.JSONObject;
-import org.micromanager.api.SequenceSettings;
+import org.micromanager.acquisition.SequenceSettings;
+import org.micromanager.data.Image;
 
 import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
 import plugins.tprovoost.Microscopy.MicroManager.tools.MMUtils;

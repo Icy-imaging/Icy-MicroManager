@@ -30,7 +30,8 @@ import mmcorej.DeviceType;
 import mmcorej.MMCoreJ;
 import mmcorej.StrVector;
 
-import org.micromanager.MMStudio;
+import org.micromanager.internal.MMStudio;
+import org.micromanager.internal.utils.ReportingUtils;
 
 import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
 

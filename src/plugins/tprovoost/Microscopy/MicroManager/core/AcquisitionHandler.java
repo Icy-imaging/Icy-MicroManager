@@ -25,10 +25,11 @@ import mmcorej.TaggedImage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.micromanager.MMStudio;
-import org.micromanager.api.SequenceSettings;
-import org.micromanager.dialogs.AcqControlDlg;
-import org.micromanager.utils.MDUtils;
+import org.micromanager.internal.MMStudio;
+import org.micromanager.acquisition.SequenceSettings;
+import org.micromanager.data.Image;
+import org.micromanager.internal.dialogs.AcqControlDlg;
+import org.micromanager.internal.utils.MDUtils;
 
 import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
 import plugins.tprovoost.Microscopy.MicroManager.event.AcquisitionListener;

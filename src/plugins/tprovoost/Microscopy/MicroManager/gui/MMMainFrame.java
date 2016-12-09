@@ -45,15 +45,18 @@ import mmcorej.CMMCore;
 import mmcorej.MMCoreJ;
 import mmcorej.MMEventCallback;
 
-import org.micromanager.MMOptions;
-import org.micromanager.MMStudio;
-import org.micromanager.MainFrame;
-import org.micromanager.PropertyEditor;
-import org.micromanager.conf2.ConfiguratorDlg2;
-import org.micromanager.conf2.MMConfigFileException;
-import org.micromanager.conf2.MicroscopeModel;
-import org.micromanager.dialogs.CalibrationListDlg;
-import org.micromanager.utils.ReportingUtils;
+import org.micromanager.internal.MMStudio;
+import org.micromanager.internal.MMVersion;
+import org.micromanager.internal.MainFrame;
+import org.micromanager.internal.PropertyEditor;
+import org.micromanager.internal.hcwizard.MMConfigFileException;
+import org.micromanager.internal.hcwizard.MicroscopeModel;
+import org.micromanager.internal.dialogs.AcqControlDlg;
+import org.micromanager.internal.dialogs.CalibrationListDlg;
+import org.micromanager.internal.dialogs.IntroDlg;
+import org.micromanager.internal.dialogs.OptionsDlg;
+import org.micromanager.internal.utils.DefaultUserProfile;
+import org.micromanager.internal.utils.ReportingUtils;
 
 import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
 import plugins.tprovoost.Microscopy.MicroManager.core.AcquisitionHandler;

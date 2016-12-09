@@ -25,10 +25,11 @@ import javax.swing.border.TitledBorder;
 
 import mmcorej.CMMCore;
 
-import org.micromanager.ConfigGroupPad;
-import org.micromanager.MMStudio;
-import org.micromanager.dialogs.GroupEditor;
-import org.micromanager.dialogs.PresetEditor;
+import org.micromanager.internal.ConfigGroupPad;
+import org.micromanager.internal.MMStudio;
+import org.micromanager.internal.dialogs.GroupEditor;
+import org.micromanager.internal.dialogs.PresetEditor;
+import org.micromanager.internal.utils.ReportingUtils;
 
 import plugins.tprovoost.Microscopy.MicroManager.tools.MMUtils;
 

@@ -9,17 +9,23 @@ import java.util.prefs.Preferences;
 
 import javax.swing.WindowConstants;
 
-import org.json.JSONObject;
-import org.micromanager.MMStudio;
-import org.micromanager.MMVersion;
-import org.micromanager.acquisition.AcquisitionEngine;
-import org.micromanager.acquisition.AcquisitionWrapperEngine;
-import org.micromanager.acquisition.TaggedImageQueue;
-import org.micromanager.api.IAcquisitionEngine2010;
-import org.micromanager.api.SequenceSettings;
-import org.micromanager.api.TaggedImageAnalyzer;
-import org.micromanager.utils.MDUtils;
-import org.micromanager.utils.ReportingUtils;
+import org.micromanager.internal.MMStudio;
+import org.micromanager.internal.MMVersion;
+import org.micromanager.acquisition.internal.AcquisitionEngine;
+import org.micromanager.acquisition.internal.AcquisitionWrapperEngine;
+import org.micromanager.acquisition.internal.TaggedImageQueue;
+import org.micromanager.data.Coords;
+import org.micromanager.data.Image;
+import org.micromanager.data.Metadata;
+import org.micromanager.data.Processor;
+import org.micromanager.data.ProcessorContext;
+import org.micromanager.acquisition.internal.IAcquisitionEngine2010;
+import org.micromanager.acquisition.SequenceSettings;
+import org.micromanager.internal.utils.ImageUtils;
+//TODO
+//import org.micromanager.api.TaggedImageAnalyzer;
+import org.micromanager.internal.utils.MDUtils;
+import org.micromanager.internal.utils.ReportingUtils;
 
 import icy.common.Version;
 import icy.file.FileUtil;
@@ -32,20 +38,21 @@ import icy.system.IcyExceptionHandler;
 import icy.system.thread.ThreadUtil;
 import icy.util.ClassUtil;
 import icy.util.StringUtil;
+import ij.process.FloatProcessor;
 import mmcorej.CMMCore;
 import mmcorej.MMCoreJ;
 import mmcorej.StrVector;
 import mmcorej.TaggedImage;
-import plugins.tprovoost.Microscopy.MicroManager.core.AcquisitionResult;
-import plugins.tprovoost.Microscopy.MicroManager.event.AcquisitionListener;
-import plugins.tprovoost.Microscopy.MicroManager.event.LiveListener;
-import plugins.tprovoost.Microscopy.MicroManager.gui.LoadFrame;
-import plugins.tprovoost.Microscopy.MicroManager.gui.LoadingFrame;
-import plugins.tprovoost.Microscopy.MicroManager.gui.MMMainFrame;
-import plugins.tprovoost.Microscopy.MicroManager.tools.MMUtils;
-import plugins.tprovoost.Microscopy.MicroManager.tools.StageMover;
-import plugins.tprovoost.Microscopy.MicroManagerForIcy.MicromanagerPlugin;
-import plugins.tprovoost.Microscopy.MicroManagerForIcy.MicroscopePlugin;
+import plugins.tongli.Microscopy.MicroManager2.core.AcquisitionResult;
+import plugins.tongli.Microscopy.MicroManager2.event.AcquisitionListener;
+import plugins.tongli.Microscopy.MicroManager2.event.LiveListener;
+import plugins.tongli.Microscopy.MicroManager2.gui.LoadFrame;
+import plugins.tongli.Microscopy.MicroManager2.gui.LoadingFrame;
+import plugins.tongli.Microscopy.MicroManager2.gui.MMMainFrame;
+import plugins.tongli.Microscopy.MicroManager2.tools.MMUtils;
+import plugins.tongli.Microscopy.MicroManager2.tools.StageMover;
+import plugins.tongli.Microscopy.MicroManager2ForIcy.MicromanagerPlugin;
+import plugins.tongli.Microscopy.MicroManager2ForIcy.MicroscopePlugin;
 
 public class MicroManager
 {

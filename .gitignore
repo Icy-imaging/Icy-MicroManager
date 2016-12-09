@@ -1,0 +1,5 @@
+/plugins/
+
+#IntelliJ project files
+.idea/
+Icy-MicroManager.iml

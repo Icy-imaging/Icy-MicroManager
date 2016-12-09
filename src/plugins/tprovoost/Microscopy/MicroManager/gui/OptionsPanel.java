@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.text.ParseException;
 
 import javax.swing.JButton;
@@ -18,11 +19,14 @@ import javax.swing.JTextField;
 
 import mmcorej.CMMCore;
 
-import org.micromanager.MMOptions;
-import org.micromanager.logging.LogFileManager;
-import org.micromanager.utils.NumberUtils;
-import org.micromanager.utils.ReportingUtils;
-import org.micromanager.utils.UIMonitor;
+import org.micromanager.data.internal.multipagetiff.StorageMultipageTiff;
+import org.micromanager.internal.MMStudio;
+import org.micromanager.internal.dialogs.AcqControlDlg;
+import org.micromanager.internal.logging.LogFileManager;
+import org.micromanager.internal.utils.DefaultUserProfile;
+import org.micromanager.internal.utils.NumberUtils;
+import org.micromanager.internal.utils.ReportingUtils;
+import org.micromanager.internal.utils.UIMonitor;
 
 public class OptionsPanel extends JPanel implements ActionListener
 {
