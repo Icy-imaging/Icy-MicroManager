@@ -1,5 +1,9 @@
+#auto update and compilation files ignored
 bin/
+update/
+workspace/
 
 #IntelliJ project files
 .idea/
 Icy-MicroManager.iml
+setting.xml
