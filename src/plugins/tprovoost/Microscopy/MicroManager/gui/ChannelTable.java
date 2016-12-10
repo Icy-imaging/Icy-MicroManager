@@ -15,13 +15,13 @@ import mmcorej.CMMCore;
 import mmcorej.Configuration;
 import mmcorej.PropertySetting;
 
-import org.micromanager.acquisition.AcquisitionWrapperEngine;
-import org.micromanager.dialogs.ChannelCellEditor;
-import org.micromanager.dialogs.ChannelCellRenderer;
-import org.micromanager.dialogs.ChannelTableModel;
-import org.micromanager.utils.ChannelSpec;
-import org.micromanager.utils.ColorEditor;
-import org.micromanager.utils.ColorRenderer;
+import org.micromanager.acquisition.internal.AcquisitionWrapperEngine;
+import org.micromanager.internal.dialogs.ChannelCellEditor;
+import org.micromanager.internal.dialogs.ChannelCellRenderer;
+import org.micromanager.internal.dialogs.ChannelTableModel;
+import org.micromanager.acquisition.ChannelSpec;
+import org.micromanager.internal.utils.ColorEditor;
+import org.micromanager.internal.utils.ColorRenderer;
 
 import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
 
@@ -46,8 +46,7 @@ public class ChannelTable extends JTable
         final MMMainFrame mmframe = MicroManager.getInstance();
         final AcquisitionWrapperEngine eng = MicroManager.getAcquisitionEngine();
 
-        model = new ChannelTableModel(MicroManager.getMMStudio(), eng, mmframe.exposurePrefs, mmframe.colorPrefs,
-                mmframe.options);
+        model = new ChannelTableModel(MicroManager.getMMStudio(), eng);
         model.setChannels(eng.getChannels());
         model.addTableModelListener(model);
 
@@ -57,7 +56,7 @@ public class ChannelTable extends JTable
         setModel(model);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        final ChannelCellEditor cellEditor = new ChannelCellEditor(eng, mmframe.exposurePrefs, mmframe.colorPrefs);
+        final ChannelCellEditor cellEditor = new ChannelCellEditor(eng);
         final ChannelCellRenderer cellRenderer = new ChannelCellRenderer(eng);
 
         for (int k = 0; k < model.getColumnCount(); k++)

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Icy. If not, see <http://www.gnu.org/licenses/>.
  */
-// LegacyInjector.java
+// ImageJMethods.java
 //
 
 /*
@@ -51,52 +51,37 @@
 
 package plugins.tprovoost.Microscopy.MicroManager.patch;
 
-import java.security.ProtectionDomain;
+import org.micromanager.internal.SnapLiveManager;
 
-import icy.plugin.PluginLoader;
-import icy.system.ClassPatcher;
+import icy.system.IcyExceptionHandler;
+import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
 
 /**
- * Overrides class behavior of Micro-Manager classes using bytecode manipulation. This
- * class uses the {@link ClassPatcher} (which uses Javassist) to inject method
- * hooks, which are implemented in the {@link plugins.tprovoost.Microscopy.MicroManager.patch}
- * package.
+ * Overrides {@link SnapLiveManager} methods.
  * 
  * @author Stephane Dallongeville
  */
-public class MMPatcher
+public class SnapLiveManagerMethods
 {
-    private static final String PATCH_PKG = "plugins.tprovoost.Microscopy.MicroManager.patch";
-    private static final String PATCH_SUFFIX = "Methods";
-
-    /** Overrides class behavior of Micro-Manager classes by injecting method hooks. */
-    public static void applyPatches()
+    /** Replaces <code>SnapLiveManager.getIsLiveModeOn()</code> method */
+    public static boolean getIsLiveModeOn(final SnapLiveManager obj)
     {
-        final ClassLoader classLoader = PluginLoader.getLoader();
-        final ClassPatcher hacker = new ClassPatcher(classLoader, PATCH_PKG, PATCH_SUFFIX);
+        return MicroManager.isLiveRunning();
+    }
 
-        // need to load it first
-        // override behavior of org.micromanager.MMStudio
-        hacker.replaceMethod("org.micromanager.internal.SnapLiveManager", "public boolean getIsLiveModeOn()");
-        hacker.replaceMethod("org.micromanager.internal.SnapLiveManager", "public void setLiveMode(boolean arg0)");
-
-        // this directly load the new patched MMStudio class in the Plugin class loader
-        hacker.loadClass("org.micromanager.internal.MMStudio", classLoader, null);
-        
-//        ici il faudrait faire en sorte que que le pluginloader ajoute la class dans la liste des charg�e
-//        sinon on a une erreur de duplication (bidouiller le JarClassLoader pour autoriser �a peut �tre)
-        
-        // hacker.loadClass("org.micromanager.internalinterfaces.LiveModeListener");
-        // hacker.loadClass("org.micromanager.utils.MMFrame");
-        // hacker.loadClass("org.micromanager.MainFrame");
-        // hacker.loadClass("org.micromanager.utils.MMScriptException");
-        // hacker.loadClass("org.micromanager.MMStudio$2");
-        // hacker.loadClass("org.micromanager.MMStudio$DisplayImageRoutine");
-        // hacker.loadClass("org.micromanager.utils.MMDialog");
-        // hacker.loadClass("org.micromanager.positionlist.PositionListDlg");
-        // hacker.loadClass("org.micromanager.conf2.MMConfigFileException");
-        // hacker.loadClass("org.json.JSONException");
-        // hacker.loadClass("org.micromanager.utils.MMException");
-        // hacker.loadClass("org.micromanager.graph.GraphFrame");
+    /** Replaces <code>SnapLiveManager.setLiveMode(boolean enable)</code> method */
+    public static void setLiveMode(final SnapLiveManager obj, final boolean enable)
+    {
+        try
+        {
+            if (enable)
+                MicroManager.startLiveMode();
+            else
+                MicroManager.stopLiveMode();
+        }
+        catch (Throwable t)
+        {
+            IcyExceptionHandler.showErrorMessage(t, true);
+        }
     }
 }

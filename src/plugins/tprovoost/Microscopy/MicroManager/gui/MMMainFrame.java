@@ -45,15 +45,18 @@ import mmcorej.CMMCore;
 import mmcorej.MMCoreJ;
 import mmcorej.MMEventCallback;
 
-import org.micromanager.MMOptions;
-import org.micromanager.MMStudio;
-import org.micromanager.MainFrame;
-import org.micromanager.PropertyEditor;
-import org.micromanager.conf2.ConfiguratorDlg2;
-import org.micromanager.conf2.MMConfigFileException;
-import org.micromanager.conf2.MicroscopeModel;
-import org.micromanager.dialogs.CalibrationListDlg;
-import org.micromanager.utils.ReportingUtils;
+import org.micromanager.internal.MMStudio;
+import org.micromanager.internal.MMVersion;
+import org.micromanager.internal.MainFrame;
+import org.micromanager.internal.PropertyEditor;
+import org.micromanager.internal.hcwizard.MMConfigFileException;
+import org.micromanager.internal.hcwizard.MicroscopeModel;
+import org.micromanager.internal.dialogs.AcqControlDlg;
+import org.micromanager.internal.dialogs.CalibrationListDlg;
+import org.micromanager.internal.dialogs.IntroDlg;
+import org.micromanager.internal.dialogs.OptionsDlg;
+import org.micromanager.internal.utils.DefaultUserProfile;
+import org.micromanager.internal.utils.ReportingUtils;
 
 import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
 import plugins.tprovoost.Microscopy.MicroManager.core.AcquisitionHandler;
@@ -78,7 +81,6 @@ public class MMMainFrame extends IcyFrame
     AcquisitionHandler acquisitionHandler;
 
     // extract these fields from original MMStudio object
-    MMOptions options;
     Preferences mainPreferences;
     Preferences exposurePrefs;
     Preferences colorPrefs;
@@ -116,7 +118,6 @@ public class MMMainFrame extends IcyFrame
         // set to null by default to ensure correct shutdown sequence
         mmstudio = null;
         acquisitionHandler = null;
-        options = null;
         mainPreferences = null;
         exposurePrefs = null;
         colorPrefs = null;
@@ -132,12 +133,16 @@ public class MMMainFrame extends IcyFrame
 
         try
         {
+            //TODO MM settings are now saved in for each userprofile, the replaced line do not do exactly you want but
+            //here are the objects
             // we have our own load config frame so we hide the one from MicroManager
-            final MMOptions options = new MMOptions();
-            options.loadSettings();
-            doNotAskConfigFileSave = options.doNotAskForConfigFile_;
-            options.doNotAskForConfigFile_ = true;
-            options.saveSettings();
+            doNotAskConfigFileSave = DefaultUserProfile.getShouldAlwaysUseDefaultProfile();
+            mmstudio.getUserProfile().syncToDisk();
+//            final MMOptions options = new MMOptions();
+//            options.loadSettings();
+//            doNotAskConfigFileSave = options.doNotAskForConfigFile_;
+//            options.doNotAskForConfigFile_ = true;
+//            options.saveSettings();
         }
         catch (Throwable t)
         {
@@ -165,13 +170,13 @@ public class MMMainFrame extends IcyFrame
                 {
                     try
                     {
-                        options = (MMOptions) ReflectionUtil.getFieldObject(mmstudio, "options_", true);
-
                         // patch some settings
-                        hideMDADisplaySave = options.hideMDADisplay_;
-                        closeOnExitSave = options.closeOnExit_;
-                        options.hideMDADisplay_ = true;
-                        options.closeOnExit_ = false;
+                        // patch some settings
+                        hideMDADisplaySave = mmstudio.getHideMDADisplayOption();
+                        closeOnExitSave = OptionsDlg.getShouldCloseOnExit();
+
+                        AcqControlDlg.setShouldHideMDADisplay(true);
+                        OptionsDlg.setShouldCloseOnExit(false);
                     }
                     catch (Exception ex)
                     {
@@ -343,20 +348,20 @@ public class MMMainFrame extends IcyFrame
         // stop activities
         if (mmstudio != null)
         {
-            mmstudio.closeAllAcquisitions();
+            //TODO
+            mmstudio.acquisitions().haltAcquisition();
+//            mmstudio.closeAllAcquisitions();
             mmstudio.closeSequence(true);
         }
 
         // no more reference, can be released
         mainCallback = null;
 
+        //TODO
         // restore patched settings
-        if (options != null)
-        {
-            options.doNotAskForConfigFile_ = doNotAskConfigFileSave;
-            options.hideMDADisplay_ = hideMDADisplaySave;
-            options.closeOnExit_ = closeOnExitSave;
-        }
+        DefaultUserProfile.setShouldAlwaysUseDefaultProfile(doNotAskConfigFileSave);
+        AcqControlDlg.setShouldHideMDADisplay(hideMDADisplaySave);
+//    	DefaultUserProfile.closeOnExit_ = closeOnExitSave;
     }
 
     /**
@@ -417,15 +422,15 @@ public class MMMainFrame extends IcyFrame
                         }
                         catch (Exception e1)
                         {
-                            mmstudio.logError(e1);
+                            ReportingUtils.logError(e1);
                         }
 
-                        ConfiguratorDlg2 configurator = new ConfiguratorDlg2(mmstudio.getCore(), MicroManager
-                                .getDefaultConfigFileName());
+                        String sysConfigFile = IntroDlg.getMostRecentlyUsedConfig();
+                        IntroDlg configurator = new IntroDlg(mmstudio, sysConfigFile, MMVersion.VERSION_STRING);
                         configurator.setVisible(true);
 
                         // define new default config file
-                        MicroManager.setDefaultConfigFileName(configurator.getFileName());
+                        MicroManager.setDefaultConfigFileName(configurator.getConfigFile());
                         // and load it
                         loadDefaultConfig();
                         refreshConfigs();
@@ -472,7 +477,7 @@ public class MMMainFrame extends IcyFrame
                             }
                             catch (Exception e1)
                             {
-                                mmstudio.logError(e1);
+                                ReportingUtils.logError(e1);
                             }
 
                             // define new default config file
@@ -532,9 +537,9 @@ public class MMMainFrame extends IcyFrame
                     @Override
                     public void actionPerformed(ActionEvent e)
                     {
-                        PropertyEditor editor = new PropertyEditor();
-                        editor.setGui(mmstudio);
-                        editor.setCore(mmstudio.getCore());
+                        PropertyEditor editor = new PropertyEditor(mmstudio);
+                        //TODO
+//                        editor.setCore(mmstudio.getCore());
                         editor.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                         final IcyFrame propertyBrowser = FrameUtils.addMMWindowToDesktopPane(editor);
                         propertyBrowser.setSize(380, 480);
@@ -588,11 +593,8 @@ public class MMMainFrame extends IcyFrame
                     @Override
                     public void actionPerformed(ActionEvent e)
                     {
-                        if (options == null)
-                            return;
 
-                        final OptionsPanel optionsPanel = new OptionsPanel(MMMainFrame.this, options, mmstudio
-                                .getCore());
+                        final OptionsPanel optionsPanel = new OptionsPanel(MMMainFrame.this, mmstudio);
                         final ActionDialog optionsDialog = new ActionDialog("Micro-Manager Options", optionsPanel, Icy
                                 .getMainInterface().getMainFrame());
                         optionsDialog.setOkAction(optionsPanel);
@@ -719,11 +721,6 @@ public class MMMainFrame extends IcyFrame
     public AcquisitionHandler getAcquisitionHandler()
     {
         return acquisitionHandler;
-    }
-
-    public MMOptions getOptions()
-    {
-        return options;
     }
 
     public Preferences getMainPreferences()

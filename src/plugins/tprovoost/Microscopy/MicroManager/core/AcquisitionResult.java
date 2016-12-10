@@ -8,8 +8,10 @@ import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.micromanager.api.SequenceSettings;
-import org.micromanager.utils.MDUtils;
+import org.micromanager.acquisition.SequenceSettings;
+import org.micromanager.internal.utils.MDUtils;
+import org.micromanager.data.Coords;
+import org.micromanager.data.internal.DefaultImage;
 
 import icy.main.Icy;
 import icy.sequence.Sequence;

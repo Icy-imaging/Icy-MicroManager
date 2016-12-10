@@ -30,7 +30,8 @@ import mmcorej.DeviceType;
 import mmcorej.MMCoreJ;
 import mmcorej.StrVector;
 
-import org.micromanager.MMStudio;
+import org.micromanager.internal.MMStudio;
+import org.micromanager.internal.utils.ReportingUtils;
 
 import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
 
@@ -323,12 +324,12 @@ public class CameraSettingsPanel extends JPanel implements Runnable
 
     public void logError(Exception e)
     {
-        getMMStudio().logError(e);
+        ReportingUtils.logError(e);
     }
 
     public void logError(Exception e, String msg)
     {
-        getMMStudio().logError(e, msg);
+        ReportingUtils.logError(e, msg);
     }
 
     public String getCameraName()
@@ -410,7 +411,7 @@ public class CameraSettingsPanel extends JPanel implements Runnable
         }
         catch (Exception e)
         {
-            getMMStudio().logError(e);
+            ReportingUtils.logError(e);
         }
     }
 

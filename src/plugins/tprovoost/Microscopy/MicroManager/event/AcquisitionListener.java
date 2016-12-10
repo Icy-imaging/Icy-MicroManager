@@ -4,10 +4,9 @@ import icy.sequence.Sequence;
 
 import java.util.List;
 
-import mmcorej.TaggedImage;
-
 import org.json.JSONObject;
-import org.micromanager.api.SequenceSettings;
+import org.micromanager.acquisition.SequenceSettings;
+import org.micromanager.data.Image;
 
 import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
 import plugins.tprovoost.Microscopy.MicroManager.tools.MMUtils;
@@ -32,7 +31,7 @@ public interface AcquisitionListener
      * @see MicroManager#getAcquisitionResult()
      * @see MicroManager#setStoreLastAcquisition(boolean)
      */
-    public void acqImgReveived(TaggedImage image);
+    public void acqImgReveived(Image image);
 
     /**
      * Callback when {@link MicroManager#startAcquisition(int, double)} have

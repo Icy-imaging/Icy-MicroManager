@@ -1,0 +1,27 @@
+#auto update and compilation files ignored
+bin/
+update/
+workspace/
+
+#IntelliJ project files
+.idea/
+Icy-MicroManager.iml
+setting.xml
+..gitignore.swp
+CHANGELOG.txt
+COPYING.txt
+CoreLogs/
+README.txt
+colormap/
+hs_err_pid17643.log
+icy.app/
+icy.exe
+icy.jar
+icy.sh
+ij/
+lib/
+out/
+resources.jar
+updater.jar
+version.xml
+

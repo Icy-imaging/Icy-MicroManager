@@ -14,7 +14,8 @@ import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
 import org.json.JSONObject;
-import org.micromanager.MMStudio;
+import org.micromanager.internal.MMStudio;
+import org.micromanager.internal.utils.ReportingUtils;
 
 import icy.gui.component.button.IcyButton;
 import icy.gui.component.button.IcyToggleButton;
@@ -214,12 +215,12 @@ public class ActionsPanel extends JPanel implements LiveListener, SequenceListen
 
     public void logError(Exception e)
     {
-        getMMStudio().logError(e);
+        ReportingUtils.logError(e);
     }
 
     public void logError(Exception e, String msg)
     {
-        getMMStudio().logError(e, msg);
+        ReportingUtils.logError(e, msg);
     }
 
     public void setLiveMode(boolean enable)

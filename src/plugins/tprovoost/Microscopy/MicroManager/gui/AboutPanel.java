@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import org.micromanager.MMVersion;
+import org.micromanager.internal.MMVersion;
 
 public class AboutPanel extends JPanel
 {
