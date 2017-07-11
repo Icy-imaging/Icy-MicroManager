@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
-    <jar path="MicroManager/MicroManager.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/MicroManager/export.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <jar path="Icy-MicroManager/MicroManager.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/Icy-MicroManager/export.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
@@ -11,7 +11,7 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
-        <javaElement handleIdentifier="=MicroManager/src"/>
-        <folder path="/MicroManager/res"/>
+        <javaElement handleIdentifier="=Icy-MicroManager/src"/>
+        <folder path="/Icy-MicroManager/res"/>
     </selectedElements>
 </jardesc>

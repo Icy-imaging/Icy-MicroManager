@@ -4,7 +4,6 @@
 package plugins.tprovoost.Microscopy.MicroManager.gui;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
 
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;

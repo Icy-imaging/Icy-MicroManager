@@ -1,16 +1,15 @@
 package plugins.tprovoost.Microscopy.MicroManager.gui;
 
-import icy.gui.component.NumberTextField;
-import icy.util.StringUtil;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
+
+import icy.gui.component.NumberTextField;
+import icy.util.StringUtil;
 
 public class LiveSettingsPanel extends JPanel
 {

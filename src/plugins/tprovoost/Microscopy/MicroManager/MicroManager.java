@@ -1304,8 +1304,9 @@ public class MicroManager
 
                 try
                 {
-                    // initialize circular buffer
-                    core.initializeCircularBuffer();
+                    // initialize circular buffer (only if a camera is present)
+                    if (!StringUtil.isEmpty(core.getCameraDevice()))
+                        core.initializeCircularBuffer();
                 }
                 catch (Throwable e)
                 {

@@ -18,6 +18,7 @@ import org.micromanager.MMStudio;
 
 import icy.gui.component.button.IcyButton;
 import icy.gui.component.button.IcyToggleButton;
+import icy.gui.dialog.MessageDialog;
 import icy.main.Icy;
 import icy.math.FPSMeter;
 import icy.resource.ResourceUtil;
@@ -224,6 +225,13 @@ public class ActionsPanel extends JPanel implements LiveListener, SequenceListen
 
     public void setLiveMode(boolean enable)
     {
+        // no camera --> can't set live mode
+        if (!hasCamera(true))
+        {
+            liveBtn.setSelected(false);
+            return;
+        }
+
         prepareSequences();
 
         if (enable)
@@ -254,6 +262,10 @@ public class ActionsPanel extends JPanel implements LiveListener, SequenceListen
 
     public void doSnap()
     {
+        // no camera --> can't do snap
+        if (!hasCamera(true))
+            return;
+
         final boolean liveRunning = MicroManager.isLiveRunning();
         final Sequence sequence = new Sequence("Image snap - " + getDateString());
         final LiveSettingsPanel livePanel = mainFrame.livePanel;
@@ -315,6 +327,10 @@ public class ActionsPanel extends JPanel implements LiveListener, SequenceListen
 
     public void doAlbumSnap()
     {
+        // no camera --> can't do album
+        if (!hasCamera(true))
+            return;
+
         prepareSequences();
 
         final LiveSettingsPanel livePanel = mainFrame.livePanel;
@@ -380,8 +396,32 @@ public class ActionsPanel extends JPanel implements LiveListener, SequenceListen
 
     public void startAdvAcq()
     {
+        // no camera --> can't do advanced acq
+        if (!hasCamera(true))
+            return;
+
         // just show advanced acquisition frame
         mainFrame.getAcquisitionHandler().getAcquisitionFrame().setVisible(true);
+    }
+
+    public static boolean hasCamera(boolean showError)
+    {
+        boolean result;
+
+        try
+        {
+            result = !StringUtil.isEmpty(MicroManager.getCamera());
+
+            if (!result && showError)
+                MessageDialog.showDialog("No camera device: cannot capture image.", MessageDialog.INFORMATION_MESSAGE);
+        }
+        catch (Throwable t)
+        {
+            result = false;
+            IcyExceptionHandler.handleException(t, true);
+        }
+
+        return result;
     }
 
     public void refreshGUI()

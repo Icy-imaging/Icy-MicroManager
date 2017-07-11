@@ -18,7 +18,7 @@ import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
  * 
  * @see #start()
  * @author Irsath Nguyen
- * @author Stepahne Dallongeville
+ * @author Stephane Dallongeville
  */
 public abstract class MicroscopePlugin extends Plugin
 {

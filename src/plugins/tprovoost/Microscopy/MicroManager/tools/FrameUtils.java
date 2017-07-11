@@ -1,12 +1,5 @@
 package plugins.tprovoost.Microscopy.MicroManager.tools;
 
-import icy.gui.component.button.IcyButton;
-import icy.gui.frame.IcyFrame;
-import icy.gui.util.GuiUtil;
-import icy.main.Icy;
-import icy.plugin.PluginDescriptor;
-import icy.resource.icon.IcyIcon;
-
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Window;
@@ -14,6 +7,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+
+import icy.gui.component.button.IcyButton;
+import icy.gui.frame.IcyFrame;
+import icy.gui.util.GuiUtil;
+import icy.plugin.PluginDescriptor;
+import icy.resource.icon.IcyIcon;
 
 /**
  * Utilities class used for wrapping Micro-Manager Frames and Dialogs in a IcyFrame.

@@ -46,6 +46,7 @@ import icy.util.ReflectionUtil;
 import icy.util.StringUtil;
 import loci.formats.ome.OMEXMLMetadataImpl;
 import mmcorej.TaggedImage;
+import ome.xml.meta.OMEXMLMetadata;
 import ome.xml.model.Pixels;
 import ome.xml.model.primitives.NonNegativeInteger;
 import ome.xml.model.primitives.Timestamp;
@@ -157,8 +158,16 @@ public class MMUtils
         }
         else
         {
-            // apply Micro-Manager classes aptches
-            MMPatcher.applyPatches();
+            try
+            {
+                // apply Micro-Manager classes patches
+                MMPatcher.applyPatches();
+            }
+            catch (Throwable t)
+            {
+                throw new RuntimeException("Cannot patch Micro-Manager classes, you may need to restart Icy !", t);
+            }
+
             // load DLL
             loadDllFrom(new File(uManagerRep));
             // find configuration file
@@ -495,7 +504,7 @@ public class MMUtils
         final int sizeZ = MDUtils.getNumSlices(tags);
         // get plane index from current position (dimension order = XYCZT)
         final int planeIndex = (frame * (sizeZ * sizeC)) + (slice * sizeC) + ch;
-        final OMEXMLMetadataImpl metadata = sequence.getMetadata();
+        final OMEXMLMetadata metadata = sequence.getMetadata();
 
         // first image --> set extra general metadata
         if (sequence.getNumImage() == 1)
@@ -704,6 +713,7 @@ public class MMUtils
                 }
                 catch (UnsatisfiedLinkError e)
                 {
+                    // ignore
                 }
             }
 

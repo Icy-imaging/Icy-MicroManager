@@ -1,10 +1,5 @@
 package plugins.tprovoost.Microscopy.MicroManager.gui;
 
-import icy.gui.dialog.MessageDialog;
-import icy.plugin.PluginDescriptor;
-import icy.plugin.PluginLauncher;
-import icy.plugin.PluginLoader;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +11,9 @@ import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
+import icy.plugin.PluginDescriptor;
+import icy.plugin.PluginLauncher;
+import icy.plugin.PluginLoader;
 import plugins.tprovoost.Microscopy.MicroManager.tools.FrameUtils;
 import plugins.tprovoost.Microscopy.MicroManagerForIcy.MicroscopePlugin;
 

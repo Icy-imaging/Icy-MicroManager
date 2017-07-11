@@ -1,5 +1,33 @@
 package plugins.tprovoost.Microscopy.MicroManager.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.prefs.Preferences;
+
+import javax.swing.JDialog;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
+import javax.swing.WindowConstants;
+
+import org.micromanager.MMOptions;
+import org.micromanager.MMStudio;
+import org.micromanager.MainFrame;
+import org.micromanager.PropertyEditor;
+import org.micromanager.conf2.ConfiguratorDlg2;
+import org.micromanager.conf2.MMConfigFileException;
+import org.micromanager.conf2.MicroscopeModel;
+import org.micromanager.dialogs.CalibrationListDlg;
+import org.micromanager.utils.ReportingUtils;
+
 import icy.common.MenuCallback;
 import icy.file.FileUtil;
 import icy.gui.dialog.ActionDialog;
@@ -22,39 +50,9 @@ import icy.system.SystemUtil;
 import icy.system.thread.ThreadUtil;
 import icy.util.ReflectionUtil;
 import icy.util.StringUtil;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowEvent;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.prefs.Preferences;
-
-import javax.swing.JDialog;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-import javax.swing.WindowConstants;
-
 import mmcorej.CMMCore;
 import mmcorej.MMCoreJ;
 import mmcorej.MMEventCallback;
-
-import org.micromanager.MMOptions;
-import org.micromanager.MMStudio;
-import org.micromanager.MainFrame;
-import org.micromanager.PropertyEditor;
-import org.micromanager.conf2.ConfiguratorDlg2;
-import org.micromanager.conf2.MMConfigFileException;
-import org.micromanager.conf2.MicroscopeModel;
-import org.micromanager.dialogs.CalibrationListDlg;
-import org.micromanager.utils.ReportingUtils;
-
 import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
 import plugins.tprovoost.Microscopy.MicroManager.core.AcquisitionHandler;
 import plugins.tprovoost.Microscopy.MicroManager.tools.FrameUtils;
@@ -314,8 +312,8 @@ public class MMMainFrame extends IcyFrame
         {
             if (!Icy.isExiting() && (pluginsPanel.getRunningPluginsCount() > 0))
             {
-                if (!ConfirmDialog
-                        .confirm("Some Micro-Manager plugins are still running.\nClosing this frame will interrupt all Micro-Manager activities. Continue ?"))
+                if (!ConfirmDialog.confirm(
+                        "Some Micro-Manager plugins are still running.\nClosing this frame will interrupt all Micro-Manager activities. Continue ?"))
                     return;
             }
 
@@ -420,8 +418,8 @@ public class MMMainFrame extends IcyFrame
                             mmstudio.logError(e1);
                         }
 
-                        ConfiguratorDlg2 configurator = new ConfiguratorDlg2(mmstudio.getCore(), MicroManager
-                                .getDefaultConfigFileName());
+                        ConfiguratorDlg2 configurator = new ConfiguratorDlg2(mmstudio.getCore(),
+                                MicroManager.getDefaultConfigFileName());
                         configurator.setVisible(true);
 
                         // define new default config file
@@ -435,8 +433,8 @@ public class MMMainFrame extends IcyFrame
 
                 JMenuItem menuPxSizeConfigItem = new JMenuItem("Pixel Size Config");
                 menuPxSizeConfigItem.setIcon(new IcyIcon(ResourceUtil.ICON_PROPERTIES));
-                menuPxSizeConfigItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.SHIFT_DOWN_MASK
-                        | SHORTCUTKEY_MASK));
+                menuPxSizeConfigItem.setAccelerator(
+                        KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.SHIFT_DOWN_MASK | SHORTCUTKEY_MASK));
                 menuPxSizeConfigItem.addActionListener(new ActionListener()
                 {
                     @Override
@@ -453,8 +451,8 @@ public class MMMainFrame extends IcyFrame
                 });
 
                 JMenuItem loadConfigItem = new JMenuItem("Load Configuration");
-                loadConfigItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.SHIFT_DOWN_MASK
-                        | SHORTCUTKEY_MASK));
+                loadConfigItem.setAccelerator(
+                        KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.SHIFT_DOWN_MASK | SHORTCUTKEY_MASK));
                 loadConfigItem.setIcon(new IcyIcon(ResourceUtil.ICON_OPEN));
                 loadConfigItem.addActionListener(new ActionListener()
                 {
@@ -486,8 +484,8 @@ public class MMMainFrame extends IcyFrame
                 });
 
                 JMenuItem saveConfigItem = new JMenuItem("Save Configuration");
-                saveConfigItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_DOWN_MASK
-                        | SHORTCUTKEY_MASK));
+                saveConfigItem.setAccelerator(
+                        KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_DOWN_MASK | SHORTCUTKEY_MASK));
                 saveConfigItem.setIcon(new IcyIcon(ResourceUtil.ICON_SAVE));
                 saveConfigItem.addActionListener(new ActionListener()
                 {
@@ -591,10 +589,10 @@ public class MMMainFrame extends IcyFrame
                         if (options == null)
                             return;
 
-                        final OptionsPanel optionsPanel = new OptionsPanel(MMMainFrame.this, options, mmstudio
-                                .getCore());
-                        final ActionDialog optionsDialog = new ActionDialog("Micro-Manager Options", optionsPanel, Icy
-                                .getMainInterface().getMainFrame());
+                        final OptionsPanel optionsPanel = new OptionsPanel(MMMainFrame.this, options,
+                                mmstudio.getCore());
+                        final ActionDialog optionsDialog = new ActionDialog("Micro-Manager Options", optionsPanel,
+                                Icy.getMainInterface().getMainFrame());
                         optionsDialog.setOkAction(optionsPanel);
                         optionsDialog.pack();
                         optionsDialog.setResizable(false);
@@ -667,14 +665,24 @@ public class MMMainFrame extends IcyFrame
         {
             mmstudio.getCore().waitForSystem();
             mmstudio.getCore().loadSystemConfiguration(filePath);
+
+            try
+            {
+                // initialize circular buffer (only if a camera is present)
+                if (!StringUtil.isEmpty(mmstudio.getCore().getCameraDevice()))
+                    mmstudio.getCore().initializeCircularBuffer();
+            }
+            catch (Throwable e)
+            {
+                throw new Exception("Error while initializing circular buffer of Micro Manager", e);
+            }
         }
         catch (Exception e)
         {
-            MessageDialog
-                    .showDialog(
-                            "Error while initializing the microscope: please check if all devices are correctly turned on "
-                                    + "and recognized by the computer and quit any program using those devices. Pleas check also that your configuration file is correct.",
-                            MessageDialog.ERROR_MESSAGE);
+            MessageDialog.showDialog(
+                    "Error while initializing the microscope: please check if all devices are correctly turned on "
+                            + "and recognized by the computer and quit any program using those devices. Pleas check also that your configuration file is correct.",
+                    MessageDialog.ERROR_MESSAGE);
         }
         finally
         {

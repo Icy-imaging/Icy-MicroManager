@@ -51,8 +51,6 @@
 
 package plugins.tprovoost.Microscopy.MicroManager.patch;
 
-import java.security.ProtectionDomain;
-
 import icy.plugin.PluginLoader;
 import icy.system.ClassPatcher;
 
