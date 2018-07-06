@@ -1,5 +1,17 @@
 package plugins.tprovoost.Microscopy.MicroManager;
 
+import icy.common.Version;
+import icy.file.FileUtil;
+import icy.gui.dialog.MessageDialog;
+import icy.gui.frame.progress.FailedAnnounceFrame;
+import icy.image.IcyBufferedImage;
+import icy.main.Icy;
+import icy.sequence.Sequence;
+import icy.system.IcyExceptionHandler;
+import icy.system.thread.ThreadUtil;
+import icy.util.ClassUtil;
+import icy.util.StringUtil;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,17 +33,6 @@ import org.micromanager.api.TaggedImageAnalyzer;
 import org.micromanager.utils.MDUtils;
 import org.micromanager.utils.ReportingUtils;
 
-import icy.common.Version;
-import icy.file.FileUtil;
-import icy.gui.dialog.MessageDialog;
-import icy.gui.frame.progress.FailedAnnounceFrame;
-import icy.image.IcyBufferedImage;
-import icy.main.Icy;
-import icy.sequence.Sequence;
-import icy.system.IcyExceptionHandler;
-import icy.system.thread.ThreadUtil;
-import icy.util.ClassUtil;
-import icy.util.StringUtil;
 import mmcorej.CMMCore;
 import mmcorej.MMCoreJ;
 import mmcorej.StrVector;
@@ -208,11 +209,10 @@ public class MicroManager
     public static MMStudio getMMStudio()
     {
         final MMMainFrame inst = getInstance();
+        if (inst == null)
+            return null;
 
-        if (inst != null)
-            return inst.getMMStudio();
-
-        return null;
+        return inst.getMMStudio();
     }
 
     /**
@@ -227,11 +227,10 @@ public class MicroManager
     public static CMMCore getCore()
     {
         final MMStudio mmstudio = getMMStudio();
+        if (mmstudio == null)
+            return null;
 
-        if (mmstudio != null)
-            return mmstudio.getCore();
-
-        return null;
+        return mmstudio.getCore();
     }
 
     /**
@@ -249,7 +248,11 @@ public class MicroManager
      */
     public static boolean lock(long wait) throws InterruptedException
     {
-        return getInstance().lock(wait);
+        final MMMainFrame inst = getInstance();
+        if (inst == null)
+            return false;
+
+        return inst.lock(wait);
     }
 
     /**
@@ -261,7 +264,11 @@ public class MicroManager
      */
     public static void lock()
     {
-        getInstance().lock();
+        final MMMainFrame inst = getInstance();
+        if (inst == null)
+            return;
+
+        inst.lock();
     }
 
     /**
@@ -272,7 +279,11 @@ public class MicroManager
      */
     public static void unlock()
     {
-        getInstance().unlock();
+        final MMMainFrame inst = getInstance();
+        if (inst == null)
+            return;
+
+        inst.unlock();
     }
 
     /**
@@ -297,7 +308,11 @@ public class MicroManager
      */
     public static AcquisitionWrapperEngine getAcquisitionEngine()
     {
-        return getMMStudio().getAcquisitionEngine();
+        final MMStudio mmstudio = getMMStudio();
+        if (mmstudio == null)
+            return null;
+
+        return mmstudio.getAcquisitionEngine();
     }
 
     /**
@@ -305,7 +320,11 @@ public class MicroManager
      */
     public static IAcquisitionEngine2010 getAcquisitionEngine2010()
     {
-        return getMMStudio().getAcquisitionEngine2010();
+        final MMStudio mmstudio = getMMStudio();
+        if (mmstudio == null)
+            return null;
+
+        return mmstudio.getAcquisitionEngine2010();
     }
 
     /**
@@ -314,7 +333,11 @@ public class MicroManager
      */
     public static SequenceSettings getAcquisitionSettings()
     {
-        return getAcquisitionEngine().getSequenceSettings();
+        final AcquisitionWrapperEngine acqEngine = getAcquisitionEngine();
+        if (acqEngine == null)
+            return null;
+
+        return acqEngine.getSequenceSettings();
     }
 
     /**
@@ -323,7 +346,11 @@ public class MicroManager
      */
     public static JSONObject getAcquisitionMetaData()
     {
-        return getAcquisitionEngine().getSummaryMetadata();
+        final AcquisitionWrapperEngine acqEngine = getAcquisitionEngine();
+        if (acqEngine == null)
+            return null;
+
+        return acqEngine.getSummaryMetadata();
     }
 
     /**
@@ -334,7 +361,6 @@ public class MicroManager
     public static long getCameraChannelCount()
     {
         final CMMCore core = MicroManager.getCore();
-
         if (core == null)
             return 0L;
 
@@ -606,7 +632,11 @@ public class MicroManager
      */
     public static boolean isLiveRunning()
     {
-        return getCore().isSequenceRunning();
+        final CMMCore core = getCore();
+        if (core == null)
+            return false;
+
+        return core.isSequenceRunning();
     }
 
     /**
@@ -793,7 +823,11 @@ public class MicroManager
      */
     public static String getCamera() throws Exception
     {
-        return getCore().getCameraDevice();
+        final CMMCore core = getCore();
+        if (core == null)
+            return "";
+
+        return core.getCameraDevice();
     }
 
     /**
@@ -801,7 +835,11 @@ public class MicroManager
      */
     public static double getExposure() throws Exception
     {
-        return getCore().getExposure();
+        final CMMCore core = getCore();
+        if (core == null)
+            return 0d;
+
+        return core.getExposure();
     }
 
     /**
@@ -812,6 +850,7 @@ public class MicroManager
         final CMMCore core = getCore();
         if (core == null)
             return;
+
         final MMStudio mmstudio = getMMStudio();
         if (mmstudio == null)
             return;
@@ -848,27 +887,34 @@ public class MicroManager
     }
 
     /**
-     * Get the current camera binning mode
+     * Get the current camera binning mode (String format)
      */
-    public static int getBinning() throws Exception
+    private static String getBinningAsString(CMMCore core, String camera) throws Exception
     {
-        final CMMCore core = getCore();
-
-        if (core != null)
-        {
-            final String camera = core.getCameraDevice();
-            if (!StringUtil.isEmpty(camera))
-                return Integer.parseInt(core.getProperty(camera, MMCoreJ.getG_Keyword_Binning()));
-        }
-
-        // default
-        return 1;
+        return core.getProperty(camera, MMCoreJ.getG_Keyword_Binning());
     }
 
     /**
-     * Set the current camera binning mode
+     * Get the current camera binning mode (String format)
      */
-    public static void setBinning(int value) throws Exception
+    public static String getBinningAsString() throws Exception
+    {
+        final CMMCore core = getCore();
+        if (core == null)
+            return "";
+
+        final String camera = core.getCameraDevice();
+        if (!StringUtil.isEmpty(camera))
+            return getBinningAsString(core, camera);
+
+        // default
+        return "";
+    }
+
+    /**
+     * Set the current camera binning mode (String format)
+     */
+    public static void setBinning(String value) throws Exception
     {
         final CMMCore core = getCore();
         if (core == null)
@@ -877,10 +923,8 @@ public class MicroManager
         final String camera = core.getCameraDevice();
         if (!StringUtil.isEmpty(camera))
         {
-            final int binning = Integer.parseInt(core.getProperty(camera, MMCoreJ.getG_Keyword_Binning()));
-
             // binning changed ?
-            if (binning != value)
+            if (getBinningAsString(core, camera) != value)
             {
                 lock();
                 try
@@ -896,7 +940,84 @@ public class MicroManager
 
                     // set new binning
                     core.waitForDevice(camera);
-                    core.setProperty(camera, MMCoreJ.getG_Keyword_Binning(), Integer.toString(value));
+                    core.setProperty(camera, MMCoreJ.getG_Keyword_Binning(), value);
+
+                    // restore continuous acquisition
+                    if (liveRunning)
+                        startLiveMode();
+                }
+                finally
+                {
+                    unlock();
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the binning in integer format
+     */
+    private static int getBinningAsInt(String value, int def) throws Exception
+    {
+        // binning can be in "1;2;4" or "1x1;2x2;4x4" format...
+        if (!StringUtil.isEmpty(value))
+            // only use the first digit to get the binning as int
+            return StringUtil.parseInt(value.substring(0, 1), 1);
+
+        // default
+        return def;
+    }
+
+    /**
+     * Get the current camera binning mode
+     */
+    public static int getBinning() throws Exception
+    {
+        return getBinningAsInt(getBinningAsString(), 1);
+    }
+
+    /**
+     * Set the current camera binning mode
+     */
+    public static void setBinning(int value) throws Exception
+    {
+        final CMMCore core = getCore();
+        if (core == null)
+            return;
+
+        final String camera = core.getCameraDevice();
+        if (!StringUtil.isEmpty(camera))
+        {
+            // binning changed ?
+            if (getBinningAsInt(getBinningAsString(core, camera), value) != value)
+            {
+                // get possible values
+                final StrVector availableBinnings = core.getAllowedPropertyValues(camera,
+                        MMCoreJ.getG_Keyword_Binning());
+
+                lock();
+                try
+                {
+                    // stop acquisition if needed
+                    stopAcquisition();
+
+                    // save continuous acquisition state
+                    final boolean liveRunning = isLiveRunning();
+                    // stop live
+                    if (liveRunning)
+                        stopLiveMode();
+
+                    // set new binning
+                    core.waitForDevice(camera);
+                    for (String binningStr : availableBinnings)
+                    {
+                        // this is the String format for wanted int value ?
+                        if (getBinningAsInt(binningStr, 0) == value)
+                        {
+                            core.setProperty(camera, MMCoreJ.getG_Keyword_Binning(), binningStr);
+                            break;
+                        }
+                    }
 
                     // restore continuous acquisition
                     if (liveRunning)
@@ -915,7 +1036,11 @@ public class MicroManager
      */
     public static String getShutter() throws Exception
     {
-        return getCore().getShutterDevice();
+        final CMMCore core = getCore();
+        if (core == null)
+            return "";
+
+        return core.getShutterDevice();
     }
 
     /**
@@ -923,13 +1048,17 @@ public class MicroManager
      */
     public static void setShutter(String value) throws Exception
     {
+        final CMMCore core = getCore();
+        if (core == null)
+            return;
+
         // value changed ?
         if (!StringUtil.equals(value, getShutter()))
         {
             lock();
             try
             {
-                getCore().setShutterDevice(value);
+                core.setShutterDevice(value);
             }
             finally
             {
@@ -943,7 +1072,11 @@ public class MicroManager
      */
     public static boolean isShutterOpen() throws Exception
     {
-        return getCore().getShutterOpen();
+        final CMMCore core = getCore();
+        if (core == null)
+            return false;
+
+        return core.getShutterOpen();
     }
 
     /**
@@ -951,13 +1084,17 @@ public class MicroManager
      */
     public static void setShutterOpen(boolean value) throws Exception
     {
+        final CMMCore core = getCore();
+        if (core == null)
+            return;
+
         // value changed ?
         if (value != isShutterOpen())
         {
             lock();
             try
             {
-                getCore().setShutterOpen(value);
+                core.setShutterOpen(value);
             }
             finally
             {
@@ -971,7 +1108,11 @@ public class MicroManager
      */
     public static boolean getAutoShutter() throws Exception
     {
-        return getCore().getAutoShutter();
+        final CMMCore core = getCore();
+        if (core == null)
+            return false;
+
+        return core.getAutoShutter();
     }
 
     /**
@@ -979,6 +1120,10 @@ public class MicroManager
      */
     public static void setAutoShutter(boolean value) throws Exception
     {
+        final CMMCore core = getCore();
+        if (core == null)
+            return;
+
         // value changed ?
         if (value != getAutoShutter())
         {
@@ -986,8 +1131,8 @@ public class MicroManager
             try
             {
                 // close shutter first then set auto shutter state
-                getCore().setShutterOpen(false);
-                getCore().setAutoShutter(value);
+                core.setShutterOpen(false);
+                core.setAutoShutter(value);
             }
             finally
             {
@@ -1002,7 +1147,11 @@ public class MicroManager
      */
     public static double getPixelSize()
     {
-        return getCore().getPixelSizeUm();
+        final CMMCore core = getCore();
+        if (core == null)
+            return 0d;
+
+        return core.getPixelSizeUm();
     }
 
     /**
@@ -1010,7 +1159,11 @@ public class MicroManager
      */
     public static List<String> getConfigGroups()
     {
-        final StrVector list = getCore().getAvailableConfigGroups();
+        final CMMCore core = getCore();
+        if (core == null)
+            return new ArrayList<String>();
+
+        final StrVector list = core.getAvailableConfigGroups();
         final List<String> result = new ArrayList<String>((int) list.size());
 
         for (int i = 0; i < list.size(); i++)
@@ -1024,10 +1177,14 @@ public class MicroManager
      */
     public static List<String> getConfigs(String group)
     {
+        final CMMCore core = getCore();
+        if (core == null)
+            return new ArrayList<String>();
+
         if (StringUtil.isEmpty(group))
             return new ArrayList<String>();
 
-        final StrVector list = getCore().getAvailableConfigs(group);
+        final StrVector list = core.getAvailableConfigs(group);
         final List<String> result = new ArrayList<String>((int) list.size());
 
         for (int i = 0; i < list.size(); i++)
@@ -1041,6 +1198,10 @@ public class MicroManager
      */
     public static String getCurrentConfig(String group) throws Exception
     {
+        final CMMCore core = getCore();
+        if (core == null)
+            return "";
+
         if (StringUtil.isEmpty(group))
             return "";
 
@@ -1052,6 +1213,10 @@ public class MicroManager
      */
     public static void setConfigForGroup(String group, String preset, boolean wait) throws Exception
     {
+        final CMMCore core = getCore();
+        if (core == null)
+            return;
+
         if (StringUtil.isEmpty(group) || StringUtil.isEmpty(preset))
             return;
 
@@ -1070,9 +1235,9 @@ public class MicroManager
                 if (liveRunning)
                     stopLiveMode();
 
-                getCore().setConfig(group, preset);
+                core.setConfig(group, preset);
                 if (wait)
-                    getCore().waitForConfig(group, preset);
+                    core.waitForConfig(group, preset);
 
                 // restore continuous acquisition
                 if (liveRunning)
@@ -1090,7 +1255,11 @@ public class MicroManager
      */
     public static String getChannelGroup()
     {
-        return getCore().getChannelGroup();
+        final CMMCore core = getCore();
+        if (core == null)
+            return "";
+
+        return core.getChannelGroup();
     }
 
     /**
@@ -1098,6 +1267,10 @@ public class MicroManager
      */
     public static void setChannelGroup(String group) throws Exception
     {
+        final CMMCore core = getCore();
+        if (core == null)
+            return;
+
         if (StringUtil.isEmpty(group))
             return;
 
@@ -1116,7 +1289,7 @@ public class MicroManager
                 if (liveRunning)
                     stopLiveMode();
 
-                getCore().setChannelGroup(group);
+                core.setChannelGroup(group);
             }
             finally
             {
@@ -1133,7 +1306,7 @@ public class MicroManager
      */
     public static List<String> getChannelConfigs()
     {
-        return MicroManager.getConfigs(MicroManager.getChannelGroup());
+        return getConfigs(MicroManager.getChannelGroup());
     }
 
     /**
@@ -1197,8 +1370,12 @@ public class MicroManager
      */
     public static void enableDebugLogging(boolean enable)
     {
-        getCore().enableDebugLog(enable);
-        getCore().enableStderrLog(enable);
+        final CMMCore core = getCore();
+        if (core == null)
+            return;
+
+        core.enableDebugLog(enable);
+        core.enableStderrLog(enable);
     }
 
     /**

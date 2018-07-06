@@ -1,5 +1,28 @@
 package plugins.tprovoost.Microscopy.MicroManager.gui;
 
+import icy.common.MenuCallback;
+import icy.file.FileUtil;
+import icy.gui.dialog.ActionDialog;
+import icy.gui.dialog.ConfirmDialog;
+import icy.gui.dialog.MessageDialog;
+import icy.gui.dialog.SaveDialog;
+import icy.gui.frame.IcyFrame;
+import icy.gui.frame.IcyFrameAdapter;
+import icy.gui.frame.IcyFrameEvent;
+import icy.gui.frame.progress.FailedAnnounceFrame;
+import icy.gui.frame.progress.ToolTipFrame;
+import icy.gui.util.ComponentUtil;
+import icy.main.Icy;
+import icy.preferences.PluginPreferences;
+import icy.preferences.XMLPreferences;
+import icy.resource.ResourceUtil;
+import icy.resource.icon.IcyIcon;
+import icy.system.IcyExceptionHandler;
+import icy.system.SystemUtil;
+import icy.system.thread.ThreadUtil;
+import icy.util.ReflectionUtil;
+import icy.util.StringUtil;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -28,28 +51,6 @@ import org.micromanager.conf2.MicroscopeModel;
 import org.micromanager.dialogs.CalibrationListDlg;
 import org.micromanager.utils.ReportingUtils;
 
-import icy.common.MenuCallback;
-import icy.file.FileUtil;
-import icy.gui.dialog.ActionDialog;
-import icy.gui.dialog.ConfirmDialog;
-import icy.gui.dialog.MessageDialog;
-import icy.gui.dialog.SaveDialog;
-import icy.gui.frame.IcyFrame;
-import icy.gui.frame.IcyFrameAdapter;
-import icy.gui.frame.IcyFrameEvent;
-import icy.gui.frame.progress.FailedAnnounceFrame;
-import icy.gui.frame.progress.ToolTipFrame;
-import icy.gui.util.ComponentUtil;
-import icy.main.Icy;
-import icy.preferences.PluginPreferences;
-import icy.preferences.XMLPreferences;
-import icy.resource.ResourceUtil;
-import icy.resource.icon.IcyIcon;
-import icy.system.IcyExceptionHandler;
-import icy.system.SystemUtil;
-import icy.system.thread.ThreadUtil;
-import icy.util.ReflectionUtil;
-import icy.util.StringUtil;
 import mmcorej.CMMCore;
 import mmcorej.MMCoreJ;
 import mmcorej.MMEventCallback;
@@ -601,6 +602,30 @@ public class MMMainFrame extends IcyFrame
                     }
                 });
 
+//                JMenuItem mmConfigProcessors = new JMenuItem("Configure processors...");
+//                mmConfigProcessors.setIcon(new IcyIcon(ResourceUtil.ICON_LIGHTING, true));
+//                mmConfigProcessors.setToolTipText("Configure on the fly image processors...");
+//                mmConfigProcessors.addActionListener(new ActionListener()
+//                {
+//                    @Override
+//                    public void actionPerformed(ActionEvent e)
+//                    {
+//                        mmstudio.showPipelinePanel();
+//                    }
+//                });
+
+                JMenuItem mmScriptPanel = new JMenuItem("Script panel");
+                mmScriptPanel.setIcon(new IcyIcon(ResourceUtil.getAlphaIconAsImage("text_curstor"), true));
+                mmScriptPanel.setToolTipText("Open Micro-Manager script panel");
+                mmScriptPanel.addActionListener(new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        mmstudio.showScriptPanel();
+                    }
+                });
+
                 int idx = 0;
                 toReturn.insert(hconfig, idx++);
                 toReturn.insert(loadConfigItem, idx++);
@@ -612,6 +637,8 @@ public class MMMainFrame extends IcyFrame
                 // toReturn.insertSeparator(idx++);
                 toReturn.insert(propertyBrowserItem, idx++);
                 toReturn.insert(menuPxSizeConfigItem, idx++);
+//                toReturn.insert(mmConfigProcessors, idx++);
+                toReturn.insert(mmScriptPanel, idx++);
                 toReturn.insert(mmSettingItem, idx++);
                 toReturn.insertSeparator(idx++);
                 toReturn.insert(aboutItem, idx++);

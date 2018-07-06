@@ -1,15 +1,16 @@
 package plugins.tprovoost.Microscopy.MicroManager.tools;
 
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
-
 import icy.preferences.XMLPreferences;
 import icy.roi.ROI2D;
 import icy.sequence.Sequence;
 import icy.system.thread.ThreadUtil;
 import icy.type.point.Point3D;
 import icy.util.StringUtil;
+
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
+
 import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
 
 /**

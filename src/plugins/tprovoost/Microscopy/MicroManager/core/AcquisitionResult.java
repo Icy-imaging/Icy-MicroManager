@@ -1,5 +1,10 @@
 package plugins.tprovoost.Microscopy.MicroManager.core;
 
+import icy.gui.viewer.Viewer;
+import icy.main.Icy;
+import icy.sequence.Sequence;
+import icy.util.DateUtil;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -11,9 +16,6 @@ import org.json.JSONObject;
 import org.micromanager.api.SequenceSettings;
 import org.micromanager.utils.MDUtils;
 
-import icy.main.Icy;
-import icy.sequence.Sequence;
-import icy.util.DateUtil;
 import mmcorej.TaggedImage;
 import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
 import plugins.tprovoost.Microscopy.MicroManager.tools.MMUtils;
@@ -66,9 +68,23 @@ public class AcquisitionResult
 
         // set image
         MMUtils.setImage(seq, taggedImage, startTime);
+
         // first image ? --> try to get more informations from summary metadata
         if (seq.getNumImage() == 1)
             MMUtils.setMetadata(seq, summaryMetadata);
+
+        // get the viewer
+        final Viewer viewer = seq.getFirstViewer();
+
+        if (viewer != null)
+        {
+            final int t = MDUtils.getFrameIndex(tags);
+            final int z = MDUtils.getSliceIndex(tags);
+
+            // synchronize viewer on acquisition
+            viewer.setPositionT(t);
+            viewer.setPositionZ(z);
+        }
     }
 
     public boolean isDone()

@@ -25,13 +25,12 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
+import org.micromanager.MMStudio;
+
 import mmcorej.CMMCore;
 import mmcorej.DeviceType;
 import mmcorej.MMCoreJ;
 import mmcorej.StrVector;
-
-import org.micromanager.MMStudio;
-
 import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
 
 public class CameraSettingsPanel extends JPanel implements Runnable
@@ -345,7 +344,10 @@ public class CameraSettingsPanel extends JPanel implements Runnable
     {
         final Object item = binningCombo.getSelectedItem();
         if (item != null)
-            return Integer.parseInt((String) item);
+        {
+            // binning can be in "1;2;4" or "1x1;2x2;4x4" format...
+            return StringUtil.parseInt(((String) item).substring(0, 1), 1);
+        }
         return 1;
     }
 

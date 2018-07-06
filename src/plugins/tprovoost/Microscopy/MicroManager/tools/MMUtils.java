@@ -1,24 +1,5 @@
 package plugins.tprovoost.Microscopy.MicroManager.tools;
 
-import java.awt.Color;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-
-import org.joda.time.DateTime;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.micromanager.ConfigGroupPad;
-import org.micromanager.acquisition.TaggedImageQueue;
-import org.micromanager.utils.MDUtils;
-
 import icy.file.FileUtil;
 import icy.gui.dialog.MessageDialog;
 import icy.gui.frame.progress.FailedAnnounceFrame;
@@ -44,7 +25,26 @@ import icy.type.point.Point3D;
 import icy.util.OMEUtil;
 import icy.util.ReflectionUtil;
 import icy.util.StringUtil;
-import loci.formats.ome.OMEXMLMetadataImpl;
+
+import java.awt.Color;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
+import org.joda.time.DateTime;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.micromanager.ConfigGroupPad;
+import org.micromanager.acquisition.TaggedImageQueue;
+import org.micromanager.utils.MDUtils;
+
 import mmcorej.TaggedImage;
 import ome.xml.meta.OMEXMLMetadata;
 import ome.xml.model.Pixels;
@@ -275,7 +275,7 @@ public class MMUtils
      */
     public static void setMetadata(Sequence sequence, JSONObject tags) throws JSONException
     {
-        final OMEXMLMetadataImpl metadata = sequence.getMetadata();
+        final OMEXMLMetadata metadata = sequence.getOMEXMLMetadata();
 
         try
         {
@@ -504,7 +504,7 @@ public class MMUtils
         final int sizeZ = MDUtils.getNumSlices(tags);
         // get plane index from current position (dimension order = XYCZT)
         final int planeIndex = (frame * (sizeZ * sizeC)) + (slice * sizeC) + ch;
-        final OMEXMLMetadata metadata = sequence.getMetadata();
+        final OMEXMLMetadata metadata = sequence.getOMEXMLMetadata();
 
         // first image --> set extra general metadata
         if (sequence.getNumImage() == 1)
