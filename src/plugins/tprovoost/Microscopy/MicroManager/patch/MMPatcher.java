@@ -73,29 +73,11 @@ public class MMPatcher
         final ClassLoader classLoader = PluginLoader.getLoader();
         final ClassPatcher hacker = new ClassPatcher(classLoader, PATCH_PKG, PATCH_SUFFIX);
 
-        // need to load it first
-
         // override behavior of org.micromanager.MMStudio
         hacker.replaceMethod("org.micromanager.MMStudio", "public boolean isLiveModeOn()");
         hacker.replaceMethod("org.micromanager.MMStudio", "public void enableLiveMode(boolean enable)");
 
         // this directly load the new patched MMStudio class in the Plugin class loader
         hacker.loadClass("org.micromanager.MMStudio", classLoader, null);
-        
-//        ici il faudrait faire en sorte que que le pluginloader ajoute la class dans la liste des chargée
-//        sinon on a une erreur de duplication (bidouiller le JarClassLoader pour autoriser ça peut être)
-        
-        // hacker.loadClass("org.micromanager.internalinterfaces.LiveModeListener");
-        // hacker.loadClass("org.micromanager.utils.MMFrame");
-        // hacker.loadClass("org.micromanager.MainFrame");
-        // hacker.loadClass("org.micromanager.utils.MMScriptException");
-        // hacker.loadClass("org.micromanager.MMStudio$2");
-        // hacker.loadClass("org.micromanager.MMStudio$DisplayImageRoutine");
-        // hacker.loadClass("org.micromanager.utils.MMDialog");
-        // hacker.loadClass("org.micromanager.positionlist.PositionListDlg");
-        // hacker.loadClass("org.micromanager.conf2.MMConfigFileException");
-        // hacker.loadClass("org.json.JSONException");
-        // hacker.loadClass("org.micromanager.utils.MMException");
-        // hacker.loadClass("org.micromanager.graph.GraphFrame");
     }
 }
