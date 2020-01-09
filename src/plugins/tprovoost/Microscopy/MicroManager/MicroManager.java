@@ -285,6 +285,54 @@ public class MicroManager
 
         inst.unlock();
     }
+    
+    /**
+     * Wait for a MM device to be ready.
+     * 
+     * @throws Exception
+     *         if an error occurs
+     */
+    public static void waitForDevice(String device) throws Exception
+    {
+        final CMMCore core = getCore();
+        if (core == null)
+            return;
+
+        final long start = System.currentTimeMillis();
+
+        if (!StringUtil.isEmpty(device))
+        {
+            boolean busy = true;
+
+            // we wait for 3 seconds max
+            while (busy && ((System.currentTimeMillis() - start) < 3000))
+            {
+                lock();
+                try
+                {
+                    busy = core.deviceBusy(device);
+                    // wait a bit if device is busy
+                    if (busy)
+                        Thread.yield();
+                }
+                finally
+                {
+                    unlock();
+                }
+            }
+
+            // just for safety we also use "waitForDevice" afterward
+            lock();
+            try
+            {
+                core.waitForDevice(device);
+            }
+            finally
+            {
+                unlock();
+            }
+        }
+    }
 
     /**
      * Get the default config file name
