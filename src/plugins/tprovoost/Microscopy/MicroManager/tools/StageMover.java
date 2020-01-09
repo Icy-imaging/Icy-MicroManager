@@ -1,16 +1,15 @@
 package plugins.tprovoost.Microscopy.MicroManager.tools;
 
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
+
 import icy.preferences.XMLPreferences;
 import icy.roi.ROI2D;
 import icy.sequence.Sequence;
 import icy.system.thread.ThreadUtil;
 import icy.type.point.Point3D;
 import icy.util.StringUtil;
-
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
-
 import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
 
 /**
@@ -167,17 +166,7 @@ public class StageMover
         final String device = getXYStageDevice();
 
         if (!StringUtil.isEmpty(device))
-        {
-            MicroManager.lock();
-            try
-            {
-                MicroManager.getCore().waitForDevice(device);
-            }
-            finally
-            {
-                MicroManager.unlock();
-            }
-        }
+            MicroManager.waitForDevice(device);
     }
 
     /**
@@ -191,17 +180,7 @@ public class StageMover
         final String device = getZFocusDevice();
 
         if (!StringUtil.isEmpty(device))
-        {
-            MicroManager.lock();
-            try
-            {
-                MicroManager.getCore().waitForDevice(device);
-            }
-            finally
-            {
-                MicroManager.unlock();
-            }
-        }
+            MicroManager.waitForDevice(device);
     }
 
     /**
@@ -425,18 +404,18 @@ public class StageMover
 
         if (!StringUtil.isEmpty(device))
         {
+            MicroManager.waitForDevice(device);
             MicroManager.lock();
             try
             {
-                MicroManager.getCore().waitForDevice(device);
                 MicroManager.getCore().setPosition(device, position);
-                if (wait)
-                    MicroManager.getCore().waitForDevice(device);
             }
             finally
             {
                 MicroManager.unlock();
             }
+            if (wait)
+                MicroManager.waitForDevice(device);
         }
     }
 
@@ -475,18 +454,18 @@ public class StageMover
 
         if (!StringUtil.isEmpty(device))
         {
+            MicroManager.waitForDevice(device);
             MicroManager.lock();
             try
             {
-                MicroManager.getCore().waitForDevice(device);
                 MicroManager.getCore().setXYPosition(device, posX, posY);
-                if (wait)
-                    MicroManager.getCore().waitForDevice(device);
             }
             finally
             {
                 MicroManager.unlock();
             }
+            if (wait)
+                MicroManager.waitForDevice(device);
         }
     }
 
@@ -523,21 +502,21 @@ public class StageMover
 
         if (!StringUtil.isEmpty(device))
         {
+            MicroManager.waitForDevice(device);
             MicroManager.lock();
             try
             {
-                MicroManager.getCore().waitForDevice(device);
                 if (invertZ)
                     MicroManager.getCore().setRelativePosition(device, -movement);
                 else
                     MicroManager.getCore().setRelativePosition(device, movement);
-                if (wait)
-                    MicroManager.getCore().waitForDevice(device);
             }
             finally
             {
                 MicroManager.unlock();
             }
+            if (wait)
+                MicroManager.waitForDevice(device);
         }
     }
 
@@ -578,26 +557,25 @@ public class StageMover
 
         if (!StringUtil.isEmpty(device))
         {
+            final int invXModifier = invertX ? -1 : 1;
+            final int invYModifier = invertY ? -1 : 1;
+
+            MicroManager.waitForDevice(device);
             MicroManager.lock();
             try
             {
-                MicroManager.getCore().waitForDevice(device);
-
-                final int invXModifier = invertX ? -1 : 1;
-                final int invYModifier = invertY ? -1 : 1;
-
                 if (switchXY)
                     MicroManager.getCore().setRelativeXYPosition(device, movY * invYModifier, movX * invXModifier);
                 else
                     MicroManager.getCore().setRelativeXYPosition(device, movX * invXModifier, movY * invYModifier);
-
-                if (wait)
-                    MicroManager.getCore().waitForDevice(device);
             }
             finally
             {
                 MicroManager.unlock();
             }
+
+            if (wait)
+                MicroManager.waitForDevice(device);
         }
     }
 
