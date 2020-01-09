@@ -1,10 +1,5 @@
 package plugins.tprovoost.Microscopy.MicroManager.core;
 
-import icy.gui.viewer.Viewer;
-import icy.main.Icy;
-import icy.sequence.Sequence;
-import icy.util.DateUtil;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -15,7 +10,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.micromanager.api.SequenceSettings;
 import org.micromanager.utils.MDUtils;
+import org.micromanager.utils.MMScriptException;
 
+import icy.gui.viewer.Viewer;
+import icy.main.Icy;
+import icy.sequence.Sequence;
+import icy.util.DateUtil;
+import icy.util.StringUtil;
 import mmcorej.TaggedImage;
 import plugins.tprovoost.Microscopy.MicroManager.MicroManager;
 import plugins.tprovoost.Microscopy.MicroManager.tools.MMUtils;
@@ -49,7 +50,7 @@ public class AcquisitionResult
         return new ArrayList<Sequence>(sequences.values());
     }
 
-    public void imageReceived(TaggedImage taggedImage) throws JSONException
+    public void imageReceived(TaggedImage taggedImage) throws JSONException, MMScriptException
     {
         final JSONObject tags = taggedImage.tags;
         final Integer position = Integer.valueOf(MDUtils.getPositionIndex(tags));
@@ -57,8 +58,11 @@ public class AcquisitionResult
         Sequence seq = sequences.get(position);
         if (seq == null)
         {
+            final String positionName = MDUtils.getPositionName(tags);
+
             // create a new sequence
-            seq = new Sequence("Acquisition - " + DateUtil.now("yyyy-MM-dd HH'h'mm'm'ss's'"));
+            seq = new Sequence("Acquisition - " + (!StringUtil.isEmpty(positionName) ? positionName + " - " : "")
+                    + DateUtil.now("yyyy-MM-dd HH'h'mm'm'ss's'"));
             sequences.put(position, seq);
 
             // display enabled ?
