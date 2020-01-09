@@ -225,9 +225,9 @@ public class AcquisitionHandler implements AcquisitionListener
     @Override
     public void acquisitionStarted(SequenceSettings settings, JSONObject metadata)
     {
-        // process on acquisition start
         try
         {
+            // process on acquisition start
             final int numImage = MDUtils.getNumPositions(metadata) * MDUtils.getNumFrames(metadata)
                     * MDUtils.getNumSlices(metadata) * MDUtils.getNumChannels(metadata);
 
