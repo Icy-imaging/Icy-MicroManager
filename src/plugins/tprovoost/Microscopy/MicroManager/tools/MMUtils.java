@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.json.JSONObject;
 import org.micromanager.ConfigGroupPad;
 import org.micromanager.acquisition.TaggedImageQueue;
 import org.micromanager.utils.MDUtils;
+import org.micromanager.utils.MMScriptException;
 
 import icy.file.FileUtil;
 import icy.gui.dialog.MessageDialog;
@@ -173,11 +175,13 @@ public class MMUtils
             // find configuration file
             File[] cfg = new File(uManagerRep).listFiles(new FilenameFilter()
             {
+
                 @Override
                 public boolean accept(File file, String s)
                 {
                     return s.equalsIgnoreCase("MMConfig_demo.cfg");
                 }
+
             });
             if (cfg != null && cfg.length > 0)
                 demoConfigFile = cfg[0];
@@ -272,40 +276,46 @@ public class MMUtils
      * Set Sequence metadata from the given JSON metadata object (can be image or summaryMetadata).
      * 
      * @throws JSONException
+     * @throws MMScriptException
      */
-    public static void setMetadata(Sequence sequence, JSONObject tags) throws JSONException
+    public static void setMetadata(Sequence sequence, JSONObject tags) throws JSONException, MMScriptException
     {
         final OMEXMLMetadata metadata = sequence.getOMEXMLMetadata();
+        final int numComp = Math.max(1, MDUtils.getNumberOfComponents(tags));
 
         try
         {
-            // summary metadata has channel colors
-            final JSONArray channelColors = tags.getJSONArray("ChColors");
-
-            for (int c = 0; c < sequence.getSizeC(); c++)
+            // only for gray image (we keep default colors for RGB image)
+            if (numComp == 1)
             {
-                final Color channelColor = new Color(channelColors.getInt(c));
+                // summary metadata has channel colors
+                final JSONArray channelColors = tags.getJSONArray("ChColors");
 
-                if (!channelColor.equals(Color.black))
+                for (int c = 0; c < sequence.getSizeC(); c++)
                 {
-                    // start by modifying colormodel colormap
-                    IcyColorMap colormap = sequence.getColorModel().getColorMap(c);
-                    if (colormap != null)
-                    {
-                        colormap.setARGBControlPoint(0, Color.black);
-                        colormap.setARGBControlPoint(255, channelColor);
-                    }
+                    final Color channelColor = new Color(channelColors.getInt(c));
 
-                    // then set user colormap
-                    colormap = sequence.getColorMap(c);
-                    if (colormap != null)
+                    if (!channelColor.equals(Color.black))
                     {
-                        colormap.setARGBControlPoint(0, Color.black);
-                        colormap.setARGBControlPoint(255, channelColor);
-                    }
+                        // start by modifying colormodel colormap
+                        IcyColorMap colormap = sequence.getColorModel().getColorMap(c);
+                        if (colormap != null)
+                        {
+                            colormap.setARGBControlPoint(0, Color.black);
+                            colormap.setARGBControlPoint(255, channelColor);
+                        }
 
-                    // and finally metadata
-                    metadata.setChannelColor(OMEUtil.getOMEColor(channelColor), 0, c);
+                        // then set user colormap
+                        colormap = sequence.getColorMap(c);
+                        if (colormap != null)
+                        {
+                            colormap.setARGBControlPoint(0, Color.black);
+                            colormap.setARGBControlPoint(255, channelColor);
+                        }
+
+                        // and finally metadata
+                        metadata.setChannelColor(OMEUtil.getOMEColor(channelColor), 0, c);
+                    }
                 }
             }
         }
@@ -321,7 +331,7 @@ public class MMUtils
 
             for (int c = 0; c < sequence.getSizeC(); c++)
             {
-                final String channelName = channelNames.getString(c);
+                final String channelName = channelNames.getString(c / numComp);
                 if (!StringUtil.isEmpty(channelName))
                     sequence.setChannelName(c, channelName);
             }
@@ -339,30 +349,34 @@ public class MMUtils
             // set channel information
             if (ch < sequence.getSizeC())
             {
-                final Color channelColor = new Color(MDUtils.getChannelColor(tags));
-
-                // the channel color information can be wrong here (set to white by default) so we
-                // ignore white as well
-                if (!channelColor.equals(Color.black) && !channelColor.equals(Color.white))
+                // only for gray image (we keep default colors for RGB image)
+                if (numComp == 1)
                 {
-                    // start by modifying colormodel colormap
-                    IcyColorMap colormap = sequence.getColorModel().getColorMap(ch);
-                    if (colormap != null)
-                    {
-                        colormap.setARGBControlPoint(0, Color.black);
-                        colormap.setARGBControlPoint(255, channelColor);
-                    }
+                    final Color channelColor = new Color(MDUtils.getChannelColor(tags));
 
-                    // then set user colormap
-                    colormap = sequence.getColorMap(ch);
-                    if (colormap != null)
+                    // the channel color information can be wrong here (set to white by default) so we
+                    // ignore white as well
+                    if (!channelColor.equals(Color.black) && !channelColor.equals(Color.white))
                     {
-                        colormap.setARGBControlPoint(0, Color.black);
-                        colormap.setARGBControlPoint(255, channelColor);
-                    }
+                        // start by modifying colormodel colormap
+                        IcyColorMap colormap = sequence.getColorModel().getColorMap(ch);
+                        if (colormap != null)
+                        {
+                            colormap.setARGBControlPoint(0, Color.black);
+                            colormap.setARGBControlPoint(255, channelColor);
+                        }
 
-                    // and finally metadata
-                    metadata.setChannelColor(OMEUtil.getOMEColor(channelColor), 0, ch);
+                        // then set user colormap
+                        colormap = sequence.getColorMap(ch);
+                        if (colormap != null)
+                        {
+                            colormap.setARGBControlPoint(0, Color.black);
+                            colormap.setARGBControlPoint(255, channelColor);
+                        }
+
+                        // and finally metadata
+                        metadata.setChannelColor(OMEUtil.getOMEColor(channelColor), 0, ch);
+                    }
                 }
 
                 final String channelName = MDUtils.getChannelName(tags);
@@ -456,6 +470,37 @@ public class MMUtils
     }
 
     /**
+     * Set image data
+     */
+    static void setImageData(IcyBufferedImage dest, Object pixels, int channel, boolean rgb)
+    {
+        if (rgb)
+        {
+            final Object RArray = dest.getDataXY((channel * 3) + 0);
+            final Object GArray = dest.getDataXY((channel * 3) + 1);
+            final Object BArray = dest.getDataXY((channel * 3) + 2);
+            final int len = dest.getSizeX() * dest.getSizeY();
+
+            int off = 0;
+            for (int i = 0; i < len; i++)
+            {
+                Array.set(RArray, i, Array.get(pixels, off + 2));
+                Array.set(GArray, i, Array.get(pixels, off + 1));
+                Array.set(BArray, i, Array.get(pixels, off + 0));
+                off += 4;
+            }
+
+            // just for data changed (with cache compatibility)
+            dest.setDataXY((channel * 3) + 0, RArray);
+            dest.setDataXY((channel * 3) + 1, GArray);
+            dest.setDataXY((channel * 3) + 2, BArray);
+        }
+        else
+            // simple copy
+            dest.setDataXY(channel, pixels);
+    }
+
+    /**
      * Set image in the specified Sequence object from the given TaggedImage.<br>
      * Returns <code>false</code> if specified image is null or empty, or if the Sequence image format is not compatible
      * with TaggedImage.
@@ -470,9 +515,11 @@ public class MMUtils
      *        metadata), set it to 0 to ignore it.
      * @return <code>true</code> if the operation succeed and <code>false</code> otherwise.
      * @throws JSONException
+     * @throws MMScriptException
      * @see {@link #setImageMetadata(TaggedImage, int, int, int, int, int, int)}
      */
-    public static boolean setImage(Sequence sequence, TaggedImage taggedImage, long startDate) throws JSONException
+    public static boolean setImage(Sequence sequence, TaggedImage taggedImage, long startDate)
+            throws JSONException, MMScriptException
     {
         // incorrect image --> do nothing
         if ((taggedImage == null) || TaggedImageQueue.isPoison(taggedImage))
@@ -496,8 +543,9 @@ public class MMUtils
         if (image == null)
             image = createEmptyImage(tags);
 
-        // set data
-        image.setDataXY(ch, taggedImage.pix);
+        // set image data
+        setImageData(image, taggedImage.pix, ch, Math.max(1, MDUtils.getNumberOfComponents(tags)) > 1);
+        // then set image in sequence
         sequence.setImage(frame, slice, image);
 
         final int sizeC = MDUtils.getNumChannels(tags);
@@ -586,8 +634,9 @@ public class MMUtils
      *        Tagged image to set in the sequence
      * @return <code>true</code> if the operation succeed and <code>false</code> otherwise.
      * @throws JSONException
+     * @throws MMScriptException
      */
-    public static boolean setImage(Sequence sequence, TaggedImage taggedImage) throws JSONException
+    public static boolean setImage(Sequence sequence, TaggedImage taggedImage) throws JSONException, MMScriptException
     {
         return setImage(sequence, taggedImage, 0L);
     }
@@ -597,15 +646,17 @@ public class MMUtils
      * and same pixel format)
      * 
      * @throws JSONException
+     * @throws MMScriptException
      */
-    public static boolean isCompatible(Sequence sequence, JSONObject metadata) throws JSONException
+    public static boolean isCompatible(Sequence sequence, JSONObject metadata) throws JSONException, MMScriptException
     {
         if (sequence.isEmpty())
             return true;
 
         return (sequence.getSizeX() == MDUtils.getWidth(metadata))
                 && (sequence.getSizeY() == MDUtils.getHeight(metadata))
-                && (sequence.getSizeC() == MDUtils.getNumChannels(metadata))
+                && (sequence.getSizeC() == (MDUtils.getNumChannels(metadata)
+                        * Math.max(1, MDUtils.getNumberOfComponents(metadata))))
                 && (sequence.getDataType_().getSize() == ((MDUtils.getBitDepth(metadata) + 7) / 8));
     }
 
@@ -614,12 +665,13 @@ public class MMUtils
      * TaggedImage or the summaryMetadata (see {@link MicroManager#getAcquisitionMetaData()})
      * 
      * @throws JSONException
+     * @throws MMScriptException
      */
-    public static IcyBufferedImage createEmptyImage(JSONObject metadata) throws JSONException
+    public static IcyBufferedImage createEmptyImage(JSONObject metadata) throws JSONException, MMScriptException
     {
         final int width = MDUtils.getWidth(metadata);
         final int height = MDUtils.getHeight(metadata);
-        final int numChannels = MDUtils.getNumChannels(metadata);
+        final int numChannels = MDUtils.getNumChannels(metadata) * Math.max(1, MDUtils.getNumberOfComponents(metadata));
         final int bpp = MDUtils.getBitDepth(metadata);
         final int bytespp = (bpp + 7) / 8;
 
